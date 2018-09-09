@@ -21,9 +21,16 @@ import objects / user
 
 const
   GetMePath = "/me"
+  GetUserPath = "/users/"
 
 proc getCurrentUser*(client: SpotifyClient | AsyncSpotifyClient): Future[User] {.multisync.} =
   let
     response = await client.request(GetMePath)
+    body = await response.body
+  result = body.toUser()
+
+proc getUser*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[User] {.multisync.} =
+  let
+    response = await client.request(GetUserPath & id)
     body = await response.body
   result = body.toUser()
