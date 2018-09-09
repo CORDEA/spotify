@@ -14,7 +14,10 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-09
 
+import json
+import paging
 import tracklink
+import jsonparser
 import externalurl
 import simpleartist
 import restrictions
@@ -29,3 +32,7 @@ type
     externalUrls*: seq[ExternalUrl]
     restrictions*: Restrictions
     linkedFrom*: TrackLink
+
+proc toSimpleTrack*(json: string): Paging[SimpleTrack] =
+  let node = parseJson json
+  unmarshal(node, result)
