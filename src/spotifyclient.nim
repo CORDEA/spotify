@@ -70,3 +70,9 @@ proc authorizationCodeGrant*(client: HttpClient | AsyncHttpClient,
     expiresIn = json["expires_in"].getStr
     refreshToken = json["refresh_token"].getStr
   result = newSpotifyToken(accessToken, refreshToken, expiresIn)
+
+proc request*(client: SpotifyClient | AsyncSpotifyClient, path: string,
+  httpMethod = HttpGet, body = ""): Future[Response | AsyncResponse] {.multisync.} =
+  let headers = getBearerRequestHeader(client.accessToken)
+  result = await client.client.request($(BaseUrl.parseUri() / path),
+    httpMethod = httpMethod, headers = headers, body = body)
