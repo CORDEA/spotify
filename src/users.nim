@@ -18,6 +18,7 @@ import httpclient
 import spotifyclient
 import asyncdispatch
 import objects / user
+import objects / publicuser
 
 const
   GetMePath = "/me"
@@ -29,8 +30,8 @@ proc getCurrentUser*(client: SpotifyClient | AsyncSpotifyClient): Future[User] {
     body = await response.body
   result = body.toUser()
 
-proc getUser*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[User] {.multisync.} =
+proc getUser*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[PublicUser] {.multisync.} =
   let
     response = await client.request(GetUserPath & id)
     body = await response.body
-  result = body.toUser()
+  result = body.toPublicUser()
