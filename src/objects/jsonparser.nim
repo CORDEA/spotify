@@ -17,6 +17,8 @@
 import json
 import strutils
 import sequtils
+import externalid
+import externalurl
 
 proc toSnakeCase(before: string): string =
   result = ""
@@ -52,3 +54,31 @@ proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
       return v
   else:
     return v
+
+proc unmarshal*[T: ref object](node: JsonNode, data: var seq[T]) =
+  when T is ExternalUrl:
+    var t = new(T)
+    unmarshal(t, node)
+    data.add t
+  elif T is ExternalId:
+    var t = new(T)
+    unmarshal(t, node)
+    data.add t
+  else:
+    for elem in node.elems:
+      var t = new(T)
+      unmarshal(elem, t)
+      data.add t
+
+proc unmarshal*[T: ref object](node: JsonNode, data: var T) =
+  new(data)
+  for rawKey, v in data[].fieldPairs:
+    let k = rawKey.replaceCommonFields()
+    var unhandled = unmarshalBasicTypes(node, k, v)
+    when unhandled is seq[ref object]:
+      unmarshal(node[k], unhandled)
+      v = unhandled
+    elif unhandled is ref object:
+      if node.hasKey(k):
+        unmarshal(node[k], unhandled)
+        v = unhandled
