@@ -31,3 +31,24 @@ proc replaceCommonFields(before: string): string =
     result = "type"
   else:
     result = before.toSnakeCase()
+
+proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
+  when v is string:
+    if node.hasKey(k) and not node[k].isNil:
+      v = node[k].getStr
+    else:
+      v = ""
+  elif v is int:
+    v = node[k].getInt
+  elif v is seq[string]:
+    if node[k].isNil:
+      v = @[]
+    else:
+      v = node[k].elems.map(proc(x: JsonNode): string = x.str)
+  elif v is seq[ref object]:
+    if node[k].isNil:
+      v = @[]
+    else:
+      return v
+  else:
+    return v
