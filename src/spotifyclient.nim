@@ -59,3 +59,14 @@ proc newAsyncSpotifyClient*(accessToken, refreshToken, expiresIn: string): Async
     expiresIn: expiresIn,
     client: client
   )
+
+proc authorizationCodeGrant*(client: HttpClient | AsyncHttpClient,
+  clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.}=
+  let
+    response = await client.authorizationCodeGrant(
+      AuthorizeUrl, TokenUrl, clientId, clientSecret, scope = scope)
+    json = parseJson(await response.body)
+    accessToken = json["access_token"].getStr
+    expiresIn = json["expires_in"].getStr
+    refreshToken = json["refresh_token"].getStr
+  result = newSpotifyToken(accessToken, refreshToken, expiresIn)
