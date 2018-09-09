@@ -16,6 +16,7 @@
 
 import ospaths
 import httpclient
+import .. / src / scope
 import .. / src / users
 import .. / src / spotifyclient
 
@@ -23,13 +24,16 @@ let
   token = newHttpClient().authorizationCodeGrant(
     getEnv("SPOTIFY_ID"),
     getEnv("SPOTIFY_SECRET"),
-    @[]
+    @[ScopeUserReadPrivate]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
   user = client.getCurrentUser()
   wizzler = client.getUser("wizzler")
 
 echo user.id
+echo user.country
+echo user.product
 echo user.displayName
+
 echo wizzler.id
 echo wizzler.displayName
