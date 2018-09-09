@@ -25,3 +25,9 @@ proc toSnakeCase(before: string): string =
       result &= "_" & r.toLowerAscii()
     else:
       result &= r
+
+proc replaceCommonFields(before: string): string =
+  if before == "objectType":
+    result = "type"
+  else:
+    result = before.toSnakeCase()
