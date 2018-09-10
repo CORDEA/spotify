@@ -15,6 +15,8 @@
 # date  : 2018-09-10
 
 import subexes
+import sequtils
+import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
@@ -27,20 +29,33 @@ const
   GetTracksPath = "/albums/$#/tracks"
   GetAlbumsPath = "/albums"
 
-proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[Album] {.multisync.} =
+proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
+  id: string, market = ""): Future[Album] {.multisync.} =
   let
-    response = await client.request(subex(GetAlbumPath) % [id])
+    path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
+    response = await client.request(path)
     body = await response.body
   result = body.toAlbum()
 
-proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[Paging[SimpleTrack]] {.multisync.} =
+proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
+  id: string, limit = 20, offset = 0, market = ""): Future[Paging[SimpleTrack]] {.multisync.} =
   let
-    response = await client.request(subex(GetTracksPath) % [id])
+    path = buildPath(subex(GetTracksPath) % [id], @[
+      newQuery("market", market),
+      newQuery("limit", $limit),
+      newQuery("offset", $offset)
+    ])
+    response = await client.request(path)
     body = await response.body
   result = body.toSimpleTrack()
 
-proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient): Future[seq[Album]] {.multisync.} =
+proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
+  ids: seq[string] = @[], market = ""): Future[seq[Album]] {.multisync.} =
   let
-    response = await client.request(GetAlbumsPath)
+    path = buildpath(GetAlbumsPath, @[
+      newQuery("ids", ids.foldr(a & "," & b)),
+      newQuery("market", market)
+    ])
+    response = await client.request(path)
     body = await response.body
   result = body.toAlbums()
