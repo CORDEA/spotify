@@ -43,10 +43,10 @@ proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
   elif v is int:
     v = node[k].getInt
   elif v is seq[string]:
-    if node[k].isNil:
-      v = @[]
-    else:
+    if node.hasKey(k) and not node[k].isNil:
       v = node[k].elems.map(proc(x: JsonNode): string = x.str)
+    else:
+      v = @[]
   elif v is seq[ref object]:
     if node[k].isNil:
       v = @[]
@@ -66,6 +66,8 @@ proc unmarshal*[T: ref object](node: JsonNode, data: var seq[T]) =
     data.add t
   else:
     for elem in node.elems:
+      if elem.kind != JObject:
+        continue
       var t = new(T)
       unmarshal(elem, t)
       data.add t

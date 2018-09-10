@@ -20,6 +20,8 @@ import .. / src / scope
 import .. / src / albums
 import .. / src / spotifyclient
 
+const target = "0sNOF9WDwhWunNAHPD3Baj"
+
 let
   token = newHttpClient().authorizationCodeGrant(
     getEnv("SPOTIFY_ID"),
@@ -27,10 +29,21 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  album = client.getAlbum("0sNOF9WDwhWunNAHPD3Baj")
+  album = client.getAlbum(target)
+  tracks = client.getAlbumTracks(target)
+  deAlbums = client.getAlbums(@[target, "53A0W3U0s8diEn9RhXQhVz"], "DE")
 
 echo album.albumType
 for artist in album.artists:
   echo artist.name
 echo album.name
 echo album.releaseDate
+
+for track in tracks.items:
+  echo track.name
+  echo track.durationMs
+
+for album in deAlbums:
+  echo album.albumType
+  echo album.name
+  echo album.releaseDate
