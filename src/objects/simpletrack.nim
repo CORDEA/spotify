@@ -16,8 +16,8 @@
 
 import json
 import paging
-import tracklink
 import jsonparser
+import linkedtrack
 import externalurl
 import simpleartist
 import restrictions
@@ -31,7 +31,7 @@ type
     availableMarkets*: seq[string]
     externalUrls*: seq[ExternalUrl]
     restrictions*: Restrictions
-    linkedFrom*: TrackLink
+    linkedFrom*: LinkedTrack
 
 proc toSimpleTrack*(json: string): Paging[SimpleTrack] =
   let node = parseJson json

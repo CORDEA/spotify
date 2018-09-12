@@ -15,9 +15,9 @@
 # date  : 2018-09-05
 
 import json
-import tracklink
 import externalid
 import jsonparser
+import linkedtrack
 import externalurl
 import simplealbum
 import simpleartist
@@ -35,7 +35,7 @@ type
     objectType*, uri*: string
     externalIds*: seq[ExternalId]
     externalUrls*: seq[ExternalUrl]
-    linkedFrom*: TrackLink
+    linkedFrom*: LinkedTrack
     restrictions*: Restrictions
 
 proc toTrack*(json: string): Track =

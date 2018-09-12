@@ -17,6 +17,6 @@
 import externalurl
 
 type
-  TrackLink* = ref object
+  LinkedTrack* = ref object
     href*, id*, objectType*, uri*: string
     externalUrls*: seq[ExternalUrl]
