@@ -24,10 +24,9 @@ type
     text*: string
     copyrightType*: CopyrightType
 
-proc unmarshal*(node: JsonNode, t: Copyright) =
-  t.text = node["text"].getStr
-  case node["type"].getStr
+proc unmarshal*(node: JsonNode, v: var CopyrightType) =
+  case node.getStr
   of $TypeCopyright:
-    t.copyrightType = TypeCopyright
+    v = TypeCopyright
   of $TypeSoundRecordingCopyright:
-    t.copyrightType = TypeSoundRecordingCopyright
+    v = TypeSoundRecordingCopyright

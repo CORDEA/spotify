@@ -29,10 +29,13 @@ proc toSnakeCase(before: string): string =
       result &= r
 
 proc replaceCommonFields(before: string): string =
-  if before == "objectType":
-    result = "type"
+  case before
+  of "objectType":
+    "type"
+  of "copyrightType":
+    "type"
   else:
-    result = before.toSnakeCase()
+    before.toSnakeCase()
 
 proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
   when v is string:
@@ -47,11 +50,6 @@ proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
       v = node[k].elems.map(proc(x: JsonNode): string = x.str)
     else:
       v = @[]
-  elif v is seq[ref object]:
-    if node[k].isNil:
-      v = @[]
-    else:
-      return v
   else:
     return v
 
@@ -77,10 +75,13 @@ proc unmarshal*[T: ref object](node: JsonNode, data: var T) =
   for rawKey, v in data[].fieldPairs:
     let k = rawKey.replaceCommonFields()
     var unhandled = unmarshalBasicTypes(node, k, v)
-    when unhandled is seq[ref object]:
-      unmarshal(node[k], unhandled)
-      v = unhandled
-    elif unhandled is ref object:
-      if node.hasKey(k):
+    if node.hasKey(k):
+      when unhandled is seq[ref object]:
+        unmarshal(node[k], unhandled)
+        v = unhandled
+      elif unhandled is ref object:
+        unmarshal(node[k], unhandled)
+        v = unhandled
+      elif unhandled is enum:
         unmarshal(node[k], unhandled)
         v = unhandled
