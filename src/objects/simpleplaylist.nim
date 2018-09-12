@@ -46,6 +46,6 @@ proc unmarshal*(unmarshaller: JsonUnmarshaller,
   else:
     v = TypePrivate
 
-proc toSimplePlaylist*(json: string): Paging[SimplePlaylist] =
+proc toSimplePlaylists*(json: string): Paging[SimplePlaylist] =
   let node = parseJson json
   newJsonUnmarshaller().unmarshal(node["playlists"], result)

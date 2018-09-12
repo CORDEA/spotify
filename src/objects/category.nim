@@ -14,9 +14,21 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
+import json
 import image
+import paging
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   Category* = ref object
     href, id, name: string
     icons: seq[Image]
+
+proc toCategory*(json: string): Category =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node, result)
+
+proc toCategories*(json: string): Paging[Category] =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node["categories"], result)
