@@ -15,6 +15,7 @@
 # date  : 2018-09-04
 
 import json
+import jsonunmarshaller
 
 type
   ExternalIdType* = enum
@@ -26,7 +27,8 @@ type
     idType*: ExternalIdType
     id*: string
 
-proc unmarshal*(t: ExternalId, node: JsonNode) =
+proc unmarshal*(unmarshaller: JsonUnmarshaller,
+  t: ExternalId, node: JsonNode) =
   for k, v in node:
     for key, value in t[].fieldPairs:
       when value is ExternalIdType:

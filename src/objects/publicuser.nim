@@ -17,8 +17,9 @@
 import json
 import image
 import followers
-import jsonparser
 import externalurl
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   PublicUser* = ref object
@@ -29,4 +30,4 @@ type
 
 proc toPublicUser*(json: string): PublicUser =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller().unmarshal(node, result)

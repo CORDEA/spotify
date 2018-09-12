@@ -16,12 +16,13 @@
 
 import json
 import externalid
-import jsonparser
 import linkedtrack
 import externalurl
 import simplealbum
 import simpleartist
 import restrictions
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   Track* = ref object
@@ -40,8 +41,8 @@ type
 
 proc toTrack*(json: string): Track =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller().unmarshal(node, result)
 
 proc toTracks*(json: string): seq[Track] =
   let node = parseJson json
-  unmarshal(node["tracks"], result)
+  newJsonUnmarshaller().unmarshal(node["tracks"], result)

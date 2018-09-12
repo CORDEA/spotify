@@ -15,6 +15,7 @@
 # date  : 2018-09-04
 
 import json
+import jsonunmarshaller
 
 type
   CopyrightType* = enum
@@ -24,7 +25,10 @@ type
     text*: string
     copyrightType*: CopyrightType
 
-proc unmarshal*(node: JsonNode, v: var CopyrightType) =
+let copyrightReplaceTargets* = @[newReplaceTarget("copyrightType", "type")]
+
+proc unmarshal*(unmarshaller: JsonUnmarshaller,
+  node: JsonNode, v: var CopyrightType) =
   case node.getStr
   of $TypeCopyright:
     v = TypeCopyright

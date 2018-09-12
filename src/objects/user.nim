@@ -14,8 +14,12 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-02
 
-import json, jsonparser
-import followers, image, externalurl
+import json
+import image
+import followers
+import externalurl
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   User* = ref object
@@ -27,4 +31,4 @@ type
 
 proc toUser*(json: string): User =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller().unmarshal(node, result)

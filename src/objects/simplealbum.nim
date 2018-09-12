@@ -17,10 +17,11 @@
 import json
 import image
 import paging
-import jsonparser
 import externalurl
 import simpleartist
 import restrictions
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   SimpleAlbum* = ref object
@@ -34,4 +35,4 @@ type
 
 proc toSimpleAlbums*(json: string): Paging[SimpleAlbum] =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller().unmarshal(node, result)

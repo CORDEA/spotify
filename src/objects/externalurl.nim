@@ -15,12 +15,14 @@
 # date  : 2018-09-02
 
 import json
+import jsonunmarshaller
 
 type
   ExternalUrl* = ref object
     urlType*, url*: string
 
-proc unmarshal*(t: ExternalUrl, node: JsonNode) =
+proc unmarshal*(unmarshaller: JsonUnmarshaller,
+  t: ExternalUrl, node: JsonNode) =
   for k, v in node:
     for key, value in t[].fieldPairs:
       when value is string:

@@ -19,11 +19,12 @@ import image
 import paging
 import copyright
 import externalid
-import jsonparser
 import externalurl
 import simpletrack
 import restrictions
 import simpleartist
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   Album* = ref object
@@ -42,8 +43,8 @@ type
 
 proc toAlbum*(json: string): Album =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller(copyrightReplaceTargets).unmarshal(node, result)
 
 proc toAlbums*(json: string): seq[Album] =
   let node = parseJson json
-  unmarshal(node["albums"], result)
+  newJsonUnmarshaller(copyrightReplaceTargets).unmarshal(node["albums"], result)

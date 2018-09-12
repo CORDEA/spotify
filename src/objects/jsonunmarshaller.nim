@@ -12,28 +12,16 @@
 # limitations under the License.
 
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
-# date  : 2018-09-04
-
-import json
-import image
-import followers
-import externalurl
-import jsonunmarshaller
-import internalunmarshallers
+# date  : 2018-09-12
 
 type
-  Artist* = ref object
-    href*, id*, name*, objectType*, uri*: string
-    externalUrls*: seq[ExternalUrl]
-    followers*: Followers
-    genres*: seq[string]
-    images*: seq[Image]
-    popularity*: int
+  ReplaceTarget* = ref object
+    fieldName*, jsonKeyName*: string
+  JsonUnmarshaller* = ref object
+    replaceTargets*: seq[ReplaceTarget]
 
-proc toArtist*(json: string): Artist =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
+proc newJsonUnmarshaller*(replaceTargets: seq[ReplaceTarget] = @[]): JsonUnmarshaller =
+  JsonUnmarshaller(replaceTargets: replaceTargets)
 
-proc toArtists*(json: string): seq[Artist] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node["artists"], result)
+proc newReplaceTarget*(fieldName, jsonKeyName: string): ReplaceTarget =
+  ReplaceTarget(fieldName: fieldName, jsonKeyName: jsonKeyName)

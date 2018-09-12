@@ -16,11 +16,12 @@
 
 import json
 import paging
-import jsonparser
 import linkedtrack
 import externalurl
 import simpleartist
 import restrictions
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   SimpleTrack* = ref object
@@ -35,4 +36,4 @@ type
 
 proc toSimpleTrack*(json: string): Paging[SimpleTrack] =
   let node = parseJson json
-  unmarshal(node, result)
+  newJsonUnmarshaller().unmarshal(node, result)

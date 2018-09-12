@@ -18,9 +18,10 @@ import json
 import image
 import paging
 import tracklink
-import jsonparser
 import publicuser
 import externalurl
+import jsonunmarshaller
+import internalunmarshallers
 
 type
   PlaylistVisibility* = enum
@@ -35,7 +36,8 @@ type
     public*: PlaylistVisibility
     tracks*: TrackLink
 
-proc unmarshal*(node: JsonNode, v: var PlaylistVisibility) =
+proc unmarshal*(unmarshaller: JsonUnmarshaller,
+  node: JsonNode, v: var PlaylistVisibility) =
   if node.kind == JNull:
     v = TypeNotRelevant
     return
@@ -46,4 +48,4 @@ proc unmarshal*(node: JsonNode, v: var PlaylistVisibility) =
 
 proc toSimplePlaylist*(json: string): Paging[SimplePlaylist] =
   let node = parseJson json
-  unmarshal(node["playlists"], result)
+  newJsonUnmarshaller().unmarshal(node["playlists"], result)
