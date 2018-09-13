@@ -34,5 +34,10 @@ type
     restrictions*: Restrictions
 
 proc toSimpleAlbums*(json: string): Paging[SimpleAlbum] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
+  let
+    node = parseJson json
+    unmarshaller = newJsonUnmarshaller()
+  if node.hasKey("albums"):
+    unmarshaller.unmarshal(node["albums"], result)
+  else:
+    unmarshaller.unmarshal(node, result)

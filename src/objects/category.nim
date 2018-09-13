@@ -22,8 +22,8 @@ import internalunmarshallers
 
 type
   Category* = ref object
-    href, id, name: string
-    icons: seq[Image]
+    href*, id*, name*: string
+    icons*: seq[Image]
 
 proc toCategory*(json: string): Category =
   let node = parseJson json
