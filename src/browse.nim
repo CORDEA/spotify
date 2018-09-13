@@ -25,6 +25,7 @@ import objects / category
 import objects / simplealbum
 import objects / simpleplaylist
 import objects / recommendations
+import objects / featuredplaylists
 
 const
   GetCategoryPath = "/browse/categories/$#"
@@ -64,9 +65,9 @@ proc getCategories*(client: SpotifyClient | AsyncSpotifyClient,
   result = body.toCategories()
 
 proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
-  country, locale, timestamp = "", limit = 20, offset = 0): Future[Paging[SimplePlaylist]] {.multisync.} =
+  country, locale, timestamp = "", limit = 20, offset = 0): Future[FeaturedPlaylists] {.multisync.} =
   let
-    path = buildPath(GetCategoriesPath, @[
+    path = buildPath(GetFeaturedPlaylistsPath, @[
       newQuery("locale", locale),
       newQuery("country", country),
       newQuery("timestamp", timestamp),
@@ -75,12 +76,12 @@ proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimplePlaylists()
+  result = body.toFeaturedPlaylists()
 
 proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
   country = "", limit = 20, offset = 0): Future[Paging[SimpleAlbum]] {.multisync.} =
   let
-    path = buildPath(GetCategoriesPath, @[
+    path = buildPath(GetNewReleasesPath, @[
       newQuery("country", country),
       newQuery("limit", $limit),
       newQuery("offset", $offset)
