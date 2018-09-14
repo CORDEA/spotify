@@ -25,7 +25,7 @@ import objects / artist
 import objects / paging
 
 const
-  GetUserTopDataPath = "/v1/me/top/$#"
+  GetUserTopDataPath = "/me/top/$#"
 
 type
   TimeRange* = enum
