@@ -15,6 +15,7 @@
 # date  : 2018-09-05
 
 import json
+import paging
 import externalid
 import linkedtrack
 import externalurl
@@ -46,3 +47,7 @@ proc toTrack*(json: string): Track =
 proc toTracks*(json: string): seq[Track] =
   let node = parseJson json
   newJsonUnmarshaller().unmarshal(node["tracks"], result)
+
+proc toPagingTracks*(json: string): Paging[Track] =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node, result)

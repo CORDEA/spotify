@@ -16,6 +16,7 @@
 
 import json
 import image
+import paging
 import followers
 import externalurl
 import jsonunmarshaller
@@ -37,3 +38,7 @@ proc toArtist*(json: string): Artist =
 proc toArtists*(json: string): seq[Artist] =
   let node = parseJson json
   newJsonUnmarshaller().unmarshal(node["artists"], result)
+
+proc toPagingArtists*(json: string): Paging[Artist] =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node, result)
