@@ -20,6 +20,7 @@ import paging
 import followers
 import externalurl
 import jsonunmarshaller
+import cursorbasedpaging
 import internalunmarshallers
 
 type
@@ -42,3 +43,7 @@ proc toArtists*(json: string): seq[Artist] =
 proc toPagingArtists*(json: string): Paging[Artist] =
   let node = parseJson json
   newJsonUnmarshaller().unmarshal(node, result)
+
+proc toCursorBasedPagingArtist*(json: string): CursorBasedPaging[Artist] =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node["artists"], result)
