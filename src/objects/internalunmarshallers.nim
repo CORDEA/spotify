@@ -48,6 +48,8 @@ proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
       v = ""
   elif v is int:
     v = node[k].getInt
+  elif v is bool:
+    v = node[k].getBool
   elif v is seq[string]:
     if node.hasKey(k) and not node[k].isNil:
       v = node[k].elems.map(proc(x: JsonNode): string = x.str)
