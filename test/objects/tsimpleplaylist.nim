@@ -95,7 +95,7 @@ suite "SimplePlaylist test":
 
   test "Unmarshal playlist":
     let
-      paging = json.toSimplePlaylist()
+      paging = json.toSimplePlaylists()
       playlists = paging.items
       playlist = playlists[0]
 

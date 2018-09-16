@@ -32,16 +32,6 @@ type
 
 let deviceReplaceTargets = @[newReplaceTarget("deviceType", "type")]
 
-proc unmarshal*(unmarshaller: JsonUnmarshaller,
-  node: JsonNode, v: var DeviceType) =
-  case node.getStr
-  of $TypeComputer:
-    v = TypeComputer
-  of $TypeSmartphone:
-    v = TypeSmartphone
-  of $TypeSpeaker:
-    v = TypeSpeaker
-
 proc toDevices*(json: string): seq[Device] =
   let node = parseJson json
   newJsonUnmarshaller(deviceReplaceTargets).unmarshal(node["devices"], result)

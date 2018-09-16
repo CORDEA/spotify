@@ -26,11 +26,3 @@ type
     copyrightType*: CopyrightType
 
 let copyrightReplaceTargets* = @[newReplaceTarget("copyrightType", "type")]
-
-proc unmarshal*(unmarshaller: JsonUnmarshaller,
-  node: JsonNode, v: var CopyrightType) =
-  case node.getStr
-  of $TypeCopyright:
-    v = TypeCopyright
-  of $TypeSoundRecordingCopyright:
-    v = TypeSoundRecordingCopyright

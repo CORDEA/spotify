@@ -40,7 +40,12 @@ proc replaceCommonFields(unmarshaller: JsonUnmarshaller,
   else:
     before.toSnakeCase()
 
-proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
+proc unmarshal*[T: enum](unmarshaller: JsonUnmarshaller,
+  node: JsonNode, v: var T) =
+  v = parseEnum[T](node.getStr)
+
+proc unmarshalBasicTypes[K, V](unmarshaller: JsonUnmarshaller,
+  node: JsonNode, k: K, v: var V): V =
   when v is string:
     if node.hasKey(k) and not node[k].isNil:
       v = node[k].getStr
@@ -49,12 +54,15 @@ proc unmarshalBasicTypes[K, V](node: JsonNode, k: K, v: var V): V =
   elif v is int:
     v = node[k].getInt
   elif v is bool:
-    v = node[k].getBool
+    if node.hasKey(k):
+      v = node[k].getBool
   elif v is seq[string]:
     if node.hasKey(k) and not node[k].isNil:
       v = node[k].elems.map(proc(x: JsonNode): string = x.str)
     else:
       v = @[]
+  elif v is enum:
+    unmarshaller.unmarshal(node[k], v)
   else:
     return v
 
@@ -81,14 +89,11 @@ proc unmarshal*[T: ref object](unmarshaller: JsonUnmarshaller,
   new(data)
   for rawKey, v in data[].fieldPairs:
     let k = unmarshaller.replaceCommonFields(rawKey)
-    var unhandled = unmarshalBasicTypes(node, k, v)
+    var unhandled = unmarshaller.unmarshalBasicTypes(node, k, v)
     if node.hasKey(k):
       when unhandled is seq[ref object]:
         unmarshaller.unmarshal(node[k], unhandled)
         v = unhandled
       elif unhandled is ref object:
-        unmarshaller.unmarshal(node[k], unhandled)
-        v = unhandled
-      elif unhandled is enum:
         unmarshaller.unmarshal(node[k], unhandled)
         v = unhandled

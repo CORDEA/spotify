@@ -15,6 +15,7 @@
 # date  : 2018-09-04
 
 import json
+import strutils
 import jsonunmarshaller
 
 type
@@ -32,12 +33,6 @@ proc unmarshal*(unmarshaller: JsonUnmarshaller,
   for k, v in node:
     for key, value in t[].fieldPairs:
       when value is ExternalIdType:
-        case k
-        of $TypeInternationalStandardRecordingCode:
-          value = TypeInternationalStandardRecordingCode
-        of $TypeUniversalProductCode:
-          value = TypeUniversalProductCode
-        of $TypeInternationalArticleNumber:
-          value = TypeInternationalArticleNumber
+        value = parseEnum[ExternalIdType](k)
       elif value is string:
         value = v.getStr
