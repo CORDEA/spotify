@@ -15,23 +15,32 @@
 # date  : 2018-09-16
 
 import json
+import track
+import device
+import context
 import jsonunmarshaller
 import internalunmarshallers
 
 type
-  DeviceType* = enum
-    TypeComputer = "Computer"
-    TypeSmartphone = "Smartphone"
-    TypeSpeaker = "Speaker"
+  RepeatState* = enum
+    StateOff = "off"
+    StateTrack = "track"
+    StateContext = "context"
+  CurrentlyPlayingType* = enum
+    TypeTrack = "track"
+    TypeEpisode = "episode"
+    TypeAd = "ad"
+    TypeUnknown = "unknown"
 
-  Device* = ref object
-    id*, name*: string
-    isActive*, isPrivateSession*, isRestricted*: bool
-    deviceType*: DeviceType
-    volumePercent*: int
+  CurrentlyPlayingContext* = ref object
+    device*: Device
+    repeatState*: RepeatState
+    shuffleState*, isPlaying*: bool
+    context*: Context
+    timestamp*, progressMs*: int
+    item*: Track
+    currentlyPlayingType*: CurrentlyPlayingType
 
-let deviceReplaceTargets* = @[newReplaceTarget("deviceType", "type")]
-
-proc toDevices*(json: string): seq[Device] =
+proc toCurrentlyPlayingContext*(json: string): CurrentlyPlayingContext =
   let node = parseJson json
-  newJsonUnmarshaller(deviceReplaceTargets).unmarshal(node["devices"], result)
+  newJsonUnmarshaller(deviceReplaceTargets).unmarshal(node, result)
