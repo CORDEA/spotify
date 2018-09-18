@@ -14,7 +14,15 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-02
 
+import json
+import jsonunmarshaller
+import internalunmarshallers
+
 type
   Image* = ref object
     height*, width*: int
     url*: string
+
+proc toImages*(json: string): seq[Image] =
+  let node = parseJson json
+  newJsonUnmarshaller().unmarshal(node, result)

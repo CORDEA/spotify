@@ -47,5 +47,10 @@ proc unmarshal*(unmarshaller: JsonUnmarshaller,
     v = TypePrivate
 
 proc toSimplePlaylists*(json: string): Paging[SimplePlaylist] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node["playlists"], result)
+  let
+    node = parseJson json
+    unmarshaller = newJsonUnmarshaller()
+  if node.hasKey("playlists"):
+    unmarshaller.unmarshal(node["playlists"], result)
+  else:
+    unmarshaller.unmarshal(node, result)
