@@ -19,5 +19,7 @@ import .. / src / spotifyuri
 
 suite "Spotifyuri test":
   test "BuildPath":
-    let path = buildPath("/example", @[newQuery("a", "1"), newQuery("a", "1"), newQuery("b", "2")])
+    var path = buildPath("/example", @[newQuery("a", "1"), newQuery("a", "1"), newQuery("b", "2")])
     check(path == "/example?a=1&a=1&b=2")
+    path = buildPath("/example", @[newQuery("a", "1 2 3")])
+    check(path == "/example?a=1+2+3")

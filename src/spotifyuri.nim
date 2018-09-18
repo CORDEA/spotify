@@ -14,6 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-10
 
+import uri
+
 type
   Query* = ref object
     key*, value*: string
@@ -27,8 +29,9 @@ proc buildPath*(path: string, queries: openarray[Query]): string =
   for query in queries:
     if query.value == "":
       continue
+    let value = query.value.encodeUrl()
     if first:
-      result &= "?" & query.key & "=" & query.value
+      result &= "?" & query.key & "=" & value
       first = false
     else:
-      result &= "&" & query.key & "=" & query.value
+      result &= "&" & query.key & "=" & value
