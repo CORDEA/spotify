@@ -14,17 +14,10 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-13
 
-import json
 import paging
 import simpleplaylist
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   FeaturedPlaylists* = ref object
     message*: string
     playlists*: Paging[SimplePlaylist]
-
-proc toFeaturedPlaylists*(json: string): FeaturedPlaylists =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

@@ -14,14 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-17
 
-import json
-import jsonunmarshaller
-import internalunmarshallers
-
 type
   Snapshot* = ref object
     snapshotId*: string
-
-proc toSnapshot*(json: string): Snapshot =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

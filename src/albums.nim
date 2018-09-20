@@ -22,7 +22,10 @@ import spotifyclient
 import asyncdispatch
 import objects / album
 import objects / paging
+import objects / copyright
 import objects / simpletrack
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   GetAlbumPath = "/albums/$#"
@@ -35,7 +38,7 @@ proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
     response = await client.request(path)
     body = await response.body
-  result = body.toAlbum()
+  result = to[Album](newJsonUnmarshaller(copyrightReplaceTargets), body)
 
 proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, limit = 20, offset = 0, market = ""): Future[Paging[SimpleTrack]] {.multisync.} =
@@ -47,7 +50,7 @@ proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimpleTrack()
+  result = to[Paging[SimpleTrack]](newJsonUnmarshaller(), body)
 
 proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string] = @[], market = ""): Future[seq[Album]] {.multisync.} =
@@ -58,4 +61,4 @@ proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toAlbums()
+  result = toSeq[Album](newJsonUnmarshaller(copyrightReplaceTargets), body, "albums")

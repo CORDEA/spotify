@@ -16,6 +16,9 @@
 
 import unittest
 import .. / .. / src / objects / recommendations
+import .. / .. / src / objects / recommendationseed
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "Recommendations test":
   setup:
@@ -105,7 +108,7 @@ suite "Recommendations test":
 
   test "Unmarshal recommendations":
     let
-      recommendations = json.toRecommendations()
+      recommendations = to[Recommendations](newJsonUnmarshaller(recommendationSeedReplaceTargets), json)
       seeds = recommendations.seeds
       tracks = recommendations.tracks
       seed = seeds[0]

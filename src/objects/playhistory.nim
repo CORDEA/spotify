@@ -14,18 +14,11 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import context
 import simpletrack
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   PlayHistory* = ref object
     track*: SimpleTrack
     playedAt*: string
     context*: Context
-
-proc toPlayHistory*(json: string): PlayHistory =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

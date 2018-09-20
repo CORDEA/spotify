@@ -14,12 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import image
 import followers
 import externalurl
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   PublicUser* = ref object
@@ -27,7 +24,3 @@ type
     externalUrls*: seq[ExternalUrl]
     followers*: Followers
     images*: seq[Image]
-
-proc toPublicUser*(json: string): PublicUser =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

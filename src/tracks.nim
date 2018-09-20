@@ -23,6 +23,8 @@ import asyncdispatch
 import objects / track
 import objects / audiofeature
 import objects / audioanalysis
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   GetAudioAnalysisPath = "/audio-analysis/$#"
@@ -37,7 +39,7 @@ proc getAudioAnalysis*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetAudioAnalysisPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toAudioAnalysis()
+  result = to[AudioAnalysis](newJsonUnmarshaller(), body)
 
 proc getAudioFeature*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[AudioFeature] {.multisync.} =
@@ -45,7 +47,7 @@ proc getAudioFeature*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetAudioFeaturePath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toAudioFeature()
+  result = to[AudioFeature](newJsonUnmarshaller(), body)
 
 proc getAudioFeatures*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string]): Future[seq[AudioFeature]] {.multisync.} =
@@ -55,7 +57,7 @@ proc getAudioFeatures*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toAudioFeatures()
+  result = toSeq[AudioFeature](newJsonUnmarshaller(), body, "audio_features")
 
 proc getTrack*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, market = ""): Future[Track] {.multisync.} =
@@ -63,7 +65,7 @@ proc getTrack*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetTrackPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toTrack()
+  result = to[Track](newJsonUnmarshaller(), body)
 
 proc getTracks*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string], market = ""): Future[seq[Track]] {.multisync.} =
@@ -73,4 +75,4 @@ proc getTracks*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toTracks()
+  result = toSeq[Track](newJsonUnmarshaller(), body, "tracks")

@@ -14,7 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import image
 import paging
 import copyright
@@ -23,8 +22,6 @@ import externalurl
 import simpletrack
 import restrictions
 import simpleartist
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   Album* = ref object
@@ -40,11 +37,3 @@ type
     popularity*: int
     restrictions*: Restrictions
     tracks*: Paging[SimpleTrack]
-
-proc toAlbum*(json: string): Album =
-  let node = parseJson json
-  newJsonUnmarshaller(copyrightReplaceTargets).unmarshal(node, result)
-
-proc toAlbums*(json: string): seq[Album] =
-  let node = parseJson json
-  newJsonUnmarshaller(copyrightReplaceTargets).unmarshal(node["albums"], result)

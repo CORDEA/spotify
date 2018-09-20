@@ -14,11 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-17
 
-import json
 import track
 import context
-import jsonunmarshaller
-import internalunmarshallers
 import currentlyplayingcontext
 
 type
@@ -28,7 +25,3 @@ type
     timestamp*, progressMs*: int
     item*: Track
     currentlyPlayingType*: CurrentlyPlayingType
-
-proc toCurrentlyPlayingTrack*(json: string): CurrentlyPlayingTrack =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

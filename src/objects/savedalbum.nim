@@ -14,17 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-16
 
-import json
 import album
-import paging
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SavedAlbum* = ref object
     addedAt*: string
     album*: Album
-
-proc toSavedAlbums*(json: string): Paging[SavedAlbum] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

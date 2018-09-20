@@ -97,3 +97,23 @@ proc unmarshal*[T: ref object](unmarshaller: JsonUnmarshaller,
       elif unhandled is ref object:
         unmarshaller.unmarshal(node[k], unhandled)
         v = unhandled
+
+proc to*[T : ref object](unmarshaller: JsonUnmarshaller,
+  json: string): T =
+  let node = json.parseJson()
+  unmarshaller.unmarshal(node, result)
+
+proc to*[T : ref object](unmarshaller: JsonUnmarshaller,
+  json, key: string): T =
+  let node = json.parseJson()
+  unmarshaller.unmarshal(node[key], result)
+
+proc toSeq*[T: ref object](unmarshaller: JsonUnmarshaller,
+  json: string): seq[T] =
+  let node = json.parseJson()
+  unmarshaller.unmarshal(node, result)
+
+proc toSeq*[T: ref object](unmarshaller: JsonUnmarshaller,
+  json, key: string): seq[T] =
+  let node = json.parseJson()
+  unmarshaller.unmarshal(node[key], result)

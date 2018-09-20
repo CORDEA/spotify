@@ -20,6 +20,8 @@ import httpclient
 import spotifyclient
 import asyncdispatch
 import objects / searchresult
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   SearchPath = "/search"
@@ -46,4 +48,4 @@ proc search*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSearchResult()
+  result = to[SearchResult](newJsonUnmarshaller(), body)

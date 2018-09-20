@@ -24,6 +24,8 @@ import asyncdispatch
 import objects / paging
 import objects / savedalbum
 import objects / savedtrack
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   IsSavedAlbumsPath = "/me/albums/contains"
@@ -65,7 +67,7 @@ proc getSavedAlbums*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSavedAlbums()
+  result = to[Paging[SavedAlbum]](newJsonUnmarshaller(), body)
 
 proc getSavedTracks*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, offset = 0, market = ""): Future[Paging[SavedTrack]] {.multisync.} =
@@ -77,7 +79,7 @@ proc getSavedTracks*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSavedTracks()
+  result = to[Paging[SavedTrack]](newJsonUnmarshaller(), body)
 
 proc deleteSavedAlbums*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string] = @[]): Future[void] {.multisync.} =

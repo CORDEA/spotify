@@ -19,6 +19,8 @@ import spotifyclient
 import asyncdispatch
 import objects / user
 import objects / publicuser
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   GetMePath = "/me"
@@ -28,10 +30,11 @@ proc getCurrentUser*(client: SpotifyClient | AsyncSpotifyClient): Future[User] {
   let
     response = await client.request(GetMePath)
     body = await response.body
-  result = body.toUser()
+  result = to[User](newJsonUnmarshaller(), body)
 
-proc getUser*(client: SpotifyClient | AsyncSpotifyClient, id: string): Future[PublicUser] {.multisync.} =
+proc getUser*(client: SpotifyClient | AsyncSpotifyClient,
+  id: string): Future[PublicUser] {.multisync.} =
   let
     response = await client.request(GetUserPath & id)
     body = await response.body
-  result = body.toPublicUser()
+  result = to[PublicUser](newJsonUnmarshaller(), body)

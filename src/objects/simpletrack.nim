@@ -14,14 +14,10 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-09
 
-import json
-import paging
 import linkedtrack
 import externalurl
 import simpleartist
 import restrictions
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SimpleTrack* = ref object
@@ -33,7 +29,3 @@ type
     externalUrls*: seq[ExternalUrl]
     restrictions*: Restrictions
     linkedFrom*: LinkedTrack
-
-proc toSimpleTrack*(json: string): Paging[SimpleTrack] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

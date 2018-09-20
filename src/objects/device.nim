@@ -14,9 +14,7 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-16
 
-import json
 import jsonunmarshaller
-import internalunmarshallers
 
 type
   DeviceType* = enum
@@ -31,7 +29,3 @@ type
     volumePercent*: int
 
 let deviceReplaceTargets* = @[newReplaceTarget("deviceType", "type")]
-
-proc toDevices*(json: string): seq[Device] =
-  let node = parseJson json
-  newJsonUnmarshaller(deviceReplaceTargets).unmarshal(node["devices"], result)

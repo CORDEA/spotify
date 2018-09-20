@@ -24,6 +24,8 @@ import objects / track
 import objects / artist
 import objects / paging
 import objects / simplealbum
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   GetAristPath = "/artists/$#"
@@ -38,7 +40,7 @@ proc getArtist*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetAristPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toArtist()
+  result = to[Artist](newJsonUnmarshaller(), body)
 
 proc getArtistAlbums*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[Paging[SimpleAlbum]] {.multisync.} =
@@ -46,7 +48,7 @@ proc getArtistAlbums*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetArtistAlbumsPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimpleAlbums()
+  result = to[Paging[SimpleAlbum]](newJsonUnmarshaller(), body)
 
 proc getArtistTopTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id, market: string): Future[seq[Track]] {.multisync.} =
@@ -54,7 +56,7 @@ proc getArtistTopTracks*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetArtistTopTracksPath) % [id], @[newQuery("market", market)])
     response = await client.request(path)
     body = await response.body
-  result = body.toTracks()
+  result = toSeq[Track](newJsonUnmarshaller(), body, "tracks")
 
 proc getArtistRelatedArtists*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[seq[Artist]] {.multisync.} =
@@ -62,7 +64,7 @@ proc getArtistRelatedArtists*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetArtistRelatedArtistsPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toArtists()
+  result = toSeq[Artist](newJsonUnmarshaller(), body, "artists")
 
 proc getArtists*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string]): Future[seq[Artist]] {.multisync.} =
@@ -70,4 +72,4 @@ proc getArtists*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(GetArtistsPath, @[newQuery("ids", ids.foldr(a & "," & b))])
     response = await client.request(path)
     body = await response.body
-  result = body.toArtists()
+  result = toSeq[Artist](newJsonUnmarshaller(), body, "artists")

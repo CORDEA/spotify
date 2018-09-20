@@ -14,12 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-16
 
-import json
 import track
 import device
 import context
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   RepeatState* = enum
@@ -40,7 +37,3 @@ type
     timestamp*, progressMs*: int
     item*: Track
     currentlyPlayingType*: CurrentlyPlayingType
-
-proc toCurrentlyPlayingContext*(json: string): CurrentlyPlayingContext =
-  let node = parseJson json
-  newJsonUnmarshaller(deviceReplaceTargets).unmarshal(node, result)

@@ -14,10 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-19
 
-import json
-import jsonunmarshaller
-import internalunmarshallers
-
 type
   AudioFeature* = ref object
     acousticness*, danceability*: float
@@ -28,11 +24,3 @@ type
     timeSignature*: int
     analysisUrl*, id*, trackHref*: string
     objectType*, uri*: string
-
-proc toAudioFeature*(json: string): AudioFeature =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
-
-proc toAudioFeatures*(json: string): seq[AudioFeature] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node["audio_features"], result)

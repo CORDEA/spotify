@@ -14,12 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-17
 
-import json
 import user
 import track
-import paging
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   PlaylistTrack* = ref object
@@ -27,7 +23,3 @@ type
     addedBy*: User
     isLocal*: bool
     track*: Track
-
-proc toPlaylistTracks*(json: string): Paging[PlaylistTrack] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

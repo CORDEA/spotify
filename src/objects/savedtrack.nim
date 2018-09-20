@@ -14,17 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-15
 
-import json
 import track
-import paging
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SavedTrack* = ref object
     addedAt*: string
     track*: Track
-
-proc toSavedTracks*(json: string): Paging[SavedTrack] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

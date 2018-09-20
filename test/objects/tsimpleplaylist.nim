@@ -15,7 +15,10 @@
 # date  : 2018-09-12
 
 import unittest
+import .. / .. / src / objects / paging
 import .. / .. / src / objects / simpleplaylist
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "SimplePlaylist test":
   setup:
@@ -95,7 +98,7 @@ suite "SimplePlaylist test":
 
   test "Unmarshal playlist":
     let
-      paging = json.toSimplePlaylists()
+      paging = to[Paging[SimplePlaylist]](newJsonUnmarshaller(), json, "playlists")
       playlists = paging.items
       playlist = playlists[0]
 

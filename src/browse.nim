@@ -25,7 +25,9 @@ import objects / category
 import objects / simplealbum
 import objects / simpleplaylist
 import objects / recommendations
+import objects / jsonunmarshaller
 import objects / featuredplaylists
+import objects / internalunmarshallers
 
 const
   GetCategoryPath = "/browse/categories/$#"
@@ -41,7 +43,7 @@ proc getCategory*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetCategoryPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toCategory()
+  result = to[Category](newJsonUnmarshaller(), body)
 
 proc getCategoryPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[Paging[SimplePlaylist]] {.multisync.} =
@@ -49,7 +51,7 @@ proc getCategoryPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetCategoryPlaylistsPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimplePlaylists()
+  result = to[Paging[SimplePlaylist]](newJsonUnmarshaller(), body, "playlists")
 
 proc getCategories*(client: SpotifyClient | AsyncSpotifyClient,
   country, locale = "", limit = 20, offset = 0): Future[Paging[Category]] {.multisync.} =
@@ -62,7 +64,7 @@ proc getCategories*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toCategories()
+  result = to[Paging[Category]](newJsonUnmarshaller(), body, "categories")
 
 proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   country, locale, timestamp = "", limit = 20, offset = 0): Future[FeaturedPlaylists] {.multisync.} =
@@ -76,7 +78,7 @@ proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toFeaturedPlaylists()
+  result = to[FeaturedPlaylists](newJsonUnmarshaller(), body)
 
 proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
   country = "", limit = 20, offset = 0): Future[Paging[SimpleAlbum]] {.multisync.} =
@@ -88,6 +90,6 @@ proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimpleAlbums()
+  result = to[Paging[SimpleAlbum]](newJsonUnmarshaller(), body, "albums")
 
 # proc getRecommendations*(client: SpotifyClient | AsyncSpotifyClient): Future[Recommendations] {.multisync.} =

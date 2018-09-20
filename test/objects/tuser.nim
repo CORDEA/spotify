@@ -16,6 +16,8 @@
 
 import unittest
 import .. / .. / src / objects / user
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "User test":
   setup:
@@ -48,7 +50,7 @@ suite "User test":
     """
 
   test "Unmarshal":
-    let user = json.toUser()
+    let user = to[User](newJsonUnmarshaller(), json)
     check(user.birthdate == "1937-06-01")
     check(user.country == "SE")
     check(user.displayName == "JM Wizzler")

@@ -14,14 +14,11 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-18
 
-import json
 import track
 import artist
 import paging
 import simplealbum
 import simplePlaylist
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SearchResult* = ref object
@@ -29,7 +26,3 @@ type
     artists*: Paging[Artist]
     tracks*: Paging[Track]
     playlists*: Paging[SimplePlaylist]
-
-proc toSearchResult*(json: string): SearchResult =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

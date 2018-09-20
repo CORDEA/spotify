@@ -14,17 +14,10 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-12
 
-import json
 import simpletrack
-import jsonunmarshaller
 import recommendationseed
-import internalunmarshallers
 
 type
   Recommendations* = ref object
     seeds*: seq[RecommendationSeed]
     tracks*: seq[SimpleTrack]
-
-proc toRecommendations*(json: string): Recommendations =
-  let node = parseJson json
-  newJsonUnmarshaller(recommendationSeedReplaceTargets).unmarshal(node, result)

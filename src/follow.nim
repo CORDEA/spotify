@@ -23,6 +23,8 @@ import spotifyclient
 import asyncdispatch
 import objects / artist
 import objects / cursorbasedpaging
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   IsFollowingPath = "/me/following/contains"
@@ -100,7 +102,7 @@ proc getFollowedArtists*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toCursorBasedPagingArtist()
+  result = to[CursorBasedPaging[Artist]](newJsonUnmarshaller(), body, "artists")
 
 proc internalUnfollow(client: SpotifyClient | AsyncSpotifyClient,
   followType: string, ids: seq[string]): Future[void] {.multisync.} =

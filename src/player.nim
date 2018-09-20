@@ -23,6 +23,8 @@ import objects / device
 import objects / playhistory
 import objects / currentlyplayingtrack
 import objects / currentlyplayingcontext
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   GetUserDevicesPath = "/me/player/devices"
@@ -43,7 +45,7 @@ proc getUserDevices*(client: SpotifyClient | AsyncSpotifyClient): Future[seq[Dev
   let
     response = await client.request(GetUserDevicesPath)
     body = await response.body
-  result = body.toDevices()
+  result = toSeq[Device](newJsonUnmarshaller(deviceReplaceTargets), body, "devices")
 
 proc getUserCurrentlyPlayingContext*(client: SpotifyClient | AsyncSpotifyClient,
   market = ""): Future[CurrentlyPlayingContext] {.multisync.} =
@@ -51,7 +53,7 @@ proc getUserCurrentlyPlayingContext*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(GetUserCurrentlyPlayingContextPath, @[newQuery("market", market)])
     response = await client.request(path)
     body = await response.body
-  result = body.toCurrentlyPlayingContext()
+  result = to[CurrentlyPlayingContext](newJsonUnmarshaller(deviceReplaceTargets), body)
 
 proc getUserRecentlyPlayedTracks*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, after, before = 0): Future[PlayHistory] {.multisync.} =
@@ -64,7 +66,7 @@ proc getUserRecentlyPlayedTracks*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(GetUserRecentlyPlayedTracksPath, queries)
     response = await client.request(path)
     body = await response.body
-  result = body.toPlayHistory()
+  result = to[PlayHistory](newJsonUnmarshaller(), body)
 
 proc getUserCurrentlyPlayingTrack*(client: SpotifyClient | AsyncSpotifyClient,
   market = ""): Future[CurrentlyPlayingTrack] {.multisync.} =
@@ -72,7 +74,7 @@ proc getUserCurrentlyPlayingTrack*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(GetUserCurrentlyPlayingTrackPath, @[newQuery("market", market)])
     response = await client.request(path)
     body = await response.body
-  result = body.toCurrentlyPlayingTrack()
+  result = to[CurrentlyPlayingTrack](newJsonUnmarshaller(), body)
 
 proc pause*(client: SpotifyClient | AsyncSpotifyClient,
   deviceId = ""): Future[void] {.multisync.} =

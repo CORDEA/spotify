@@ -14,14 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import image
-import paging
 import followers
 import externalurl
-import jsonunmarshaller
-import cursorbasedpaging
-import internalunmarshallers
 
 type
   Artist* = ref object
@@ -31,19 +26,3 @@ type
     genres*: seq[string]
     images*: seq[Image]
     popularity*: int
-
-proc toArtist*(json: string): Artist =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
-
-proc toArtists*(json: string): seq[Artist] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node["artists"], result)
-
-proc toPagingArtists*(json: string): Paging[Artist] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
-
-proc toCursorBasedPagingArtist*(json: string): CursorBasedPaging[Artist] =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node["artists"], result)

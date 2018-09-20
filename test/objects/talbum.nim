@@ -18,6 +18,8 @@ import unittest
 import .. / .. / src / objects / album
 import .. / .. / src / objects / copyright
 import .. / .. / src / objects / externalid
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "Album test":
   setup:
@@ -217,7 +219,7 @@ suite "Album test":
   """
 
   test "Unmarshal album":
-    let album = albumJson.toAlbum()
+    let album = to[Album](newJsonUnmarshaller(copyrightReplaceTargets), albumJson)
     check(album.albumtype == "album")
     check(album.artists.len == 1)
     check(album.artists[0].name == "Cyndi Lauper")
@@ -245,7 +247,7 @@ suite "Album test":
 
   test "Unmarshal albums":
     let
-      albums = albumsJson.toAlbums()
+      albums = toSeq[Album](newJsonUnmarshaller(copyrightReplaceTargets), albumsJson, "albums")
       album = albums[0]
     check(albums.len == 1)
     check(album.albumtype == "album")

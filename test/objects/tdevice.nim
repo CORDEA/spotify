@@ -16,6 +16,8 @@
 
 import unittest
 import .. / .. / src / objects / device
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "Device test":
   setup:
@@ -35,7 +37,7 @@ suite "Device test":
 
   test "Unmarshal devices":
     let
-      devices = json.toDevices()
+      devices = toSeq[Device](newJsonUnmarshaller(deviceReplaceTargets), json, "devices")
       device = devices[0]
     check(devices.len == 1)
     check(device.id == "5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e")

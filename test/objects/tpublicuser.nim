@@ -16,6 +16,8 @@
 
 import unittest
 import .. / .. / src / objects / publicuser
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "PublicUser test":
   setup:
@@ -42,7 +44,7 @@ suite "PublicUser test":
     """
 
   test "Unmarshal":
-    let user = json.toPublicUser()
+    let user = to[PublicUser](newJsonUnmarshaller(), json)
     check(user.displayName == "Lilla Namo")
     check(user.externalUrls.len == 1)
     check(user.externalUrls[0].urlType == "spotify")

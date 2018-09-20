@@ -17,6 +17,8 @@
 import unittest
 import .. / .. / src / objects / track
 import .. / .. / src / objects / externalid
+import .. / .. / src / objects / jsonunmarshaller
+import .. / .. / src / objects / internalunmarshallers
 
 suite "Track test":
   setup:
@@ -233,7 +235,7 @@ suite "Track test":
 
   test "Unmarshal":
     let
-      track = json.toTrack()
+      track = to[Track](newJsonUnmarshaller(), json)
       album = track.album
       artists = track.artists
       ids = track.externalIds

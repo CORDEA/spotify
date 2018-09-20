@@ -27,6 +27,8 @@ import objects / snapshot
 import objects / playlist
 import objects / playlisttrack
 import objects / simpleplaylist
+import objects / jsonunmarshaller
+import objects / internalunmarshallers
 
 const
   PostTracksToPlaylistPath = "/playlists/$#/tracks"
@@ -51,7 +53,7 @@ proc postTracksToPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(PostTracksToPlaylistPath) % [playlistId], @[])
     response = await client.request(path, body = $body, httpMethod = HttpPost)
     responseBody = await response.body
-  result = responseBody.toSnapshot()
+  result = to[Snapshot](newJsonUnmarshaller(), responseBody)
 
 proc buildBody(name, description: string): JsonNode =
   result = newJObject()
@@ -101,7 +103,7 @@ proc postPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(PostPlaylistPath) % [userId], @[])
     response = await client.request(path, body = $body, httpMethod = HttpPost)
     responseBody = await response.body
-  result = responseBody.toPlaylist()
+  result = to[Playlist](newJsonUnmarshaller(), responseBody)
 
 proc getUserPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, offset = 0): Future[Paging[SimplePlaylist]] {.multisync.} =
@@ -112,7 +114,7 @@ proc getUserPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimplePlaylists()
+  result = to[Paging[SimplePlaylist]](newJsonUnmarshaller(), body)
 
 proc getPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   userId: string, limit = 20, offset = 0): Future[Paging[SimplePlaylist]] {.multisync.} =
@@ -123,7 +125,7 @@ proc getPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toSimplePlaylists()
+  result = to[Paging[SimplePlaylist]](newJsonUnmarshaller(), body)
 
 proc getPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string): Future[seq[Image]] {.multisync.} =
@@ -131,7 +133,7 @@ proc getPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(GetPlaylistCoverImagePath) % [playlistId], @[])
     response = await client.request(path)
     body = await response.body
-  result = body.toImages()
+  result = toSeq[Image](newJsonUnmarshaller(), body)
 
 proc getPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, fields, market = ""): Future[Playlist] {.multisync.} =
@@ -142,7 +144,7 @@ proc getPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toPlaylist()
+  result = to[Playlist](newJsonUnmarshaller(), body)
 
 proc getPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, fields = "", limit = 100,
@@ -156,7 +158,7 @@ proc getPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = body.toPlaylistTracks()
+  result = to[Paging[PlaylistTrack]](newJsonUnmarshaller(), body)
 
 proc deleteTracksFromPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, tracks: seq[string]): Future[Snapshot] {.multisync.} =
@@ -169,7 +171,7 @@ proc deleteTracksFromPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(DeleteTracksFromPlaylistPath) % [playlistId], @[])
     response = await client.request(path, body = $body, httpMethod = HttpDelete)
     responseBody = await response.body
-  result = responseBody.toSnapshot()
+  result = to[Snapshot](newJsonUnmarshaller(), responseBody)
 
 proc reorderPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, rangeStart, insertBefore: int,
@@ -185,7 +187,7 @@ proc reorderPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
     path = buildPath(subex(ReorderPlaylistTracksPath) % [playlistId], @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
     responseBody = await response.body
-  result = responseBody.toSnapshot()
+  result = to[Snapshot](newJsonUnmarshaller(), responseBody)
 
 proc replacePlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, uris: seq[string]): Future[void] {.multisync} =

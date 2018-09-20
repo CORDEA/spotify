@@ -16,12 +16,10 @@
 
 import json
 import image
-import paging
 import tracklink
 import publicuser
 import externalurl
 import jsonunmarshaller
-import internalunmarshallers
 
 type
   PlaylistVisibility* = enum
@@ -45,12 +43,3 @@ proc unmarshal*(unmarshaller: JsonUnmarshaller,
     v = TypePublic
   else:
     v = TypePrivate
-
-proc toSimplePlaylists*(json: string): Paging[SimplePlaylist] =
-  let
-    node = parseJson json
-    unmarshaller = newJsonUnmarshaller()
-  if node.hasKey("playlists"):
-    unmarshaller.unmarshal(node["playlists"], result)
-  else:
-    unmarshaller.unmarshal(node, result)

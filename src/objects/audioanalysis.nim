@@ -14,10 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-19
 
-import json
-import jsonunmarshaller
-import internalunmarshallers
-
 type
   AudioAnalysisBar* = ref object
     start*, duration*, confidence*: float
@@ -69,7 +65,3 @@ type
     segments*: seq[AudioAnalysisSegment]
     tatums*: seq[AudioAnalysisTatum]
     track*: AudioAnalysisTrack
-
-proc toAudioAnalysis*(json: string): AudioAnalysis =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)

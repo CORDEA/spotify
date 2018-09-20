@@ -14,14 +14,10 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import image
-import paging
 import externalurl
 import simpleartist
 import restrictions
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SimpleAlbum* = ref object
@@ -32,12 +28,3 @@ type
     externalUrls*: seq[ExternalUrl]
     images*: seq[Image]
     restrictions*: Restrictions
-
-proc toSimpleAlbums*(json: string): Paging[SimpleAlbum] =
-  let
-    node = parseJson json
-    unmarshaller = newJsonUnmarshaller()
-  if node.hasKey("albums"):
-    unmarshaller.unmarshal(node["albums"], result)
-  else:
-    unmarshaller.unmarshal(node, result)

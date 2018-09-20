@@ -14,15 +14,12 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
 import image
 import paging
 import followers
 import publicuser
 import externalurl
 import playlisttrack
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   Playlist* = ref object
@@ -34,7 +31,3 @@ type
     images*: seq[Image]
     owner*: PublicUser
     tracks*: Paging[PlaylistTrack]
-
-proc toPlaylist*(json: string): Playlist =
-  let node = parseJson json
-  newJsonUnmarshaller().unmarshal(node, result)
