@@ -36,6 +36,13 @@ const
   GetArtistRelatedArtistsPath = "/artists/$#/related-artists"
   GetArtistsPath = "/artists"
 
+type
+  IncludeGroupType* = enum
+    TypeAlbum = "album"
+    TypeSingle = "single"
+    TypeAppearsOn = "appears_on"
+    TypeCompilation = "compilation"
+
 proc getArtist*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[SpotifyResponse[Artist]] {.multisync.} =
   let
@@ -44,9 +51,17 @@ proc getArtist*(client: SpotifyClient | AsyncSpotifyClient,
   result = await toResponse[Artist](response)
 
 proc getArtistAlbums*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[SpotifyResponse[Paging[SimpleAlbum]]] {.multisync.} =
+  id: string, includeGroups: seq[IncludeGroupType] = @[],
+  market = "", limit = 20, offset = 0): Future[SpotifyResponse[Paging[SimpleAlbum]]] {.multisync.} =
   let
-    path = buildPath(subex(GetArtistAlbumsPath) % [id], @[])
+    path = buildPath(subex(GetArtistAlbumsPath) % [id], @[
+      newQuery("include_groups", includeGroups
+        .map(proc (x: IncludeGroupType): string = $x)
+        .foldr(a & "," & b)),
+      newQuery("market", market),
+      newQuery("limit", $limit),
+      newQuery("offset", $offset)
+    ])
     response = await client.request(path)
   result = await toResponse[Paging[SimpleAlbum]](response)
 
