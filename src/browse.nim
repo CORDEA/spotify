@@ -40,16 +40,24 @@ const
   GetRecommendationsPath = "/recommendations"
 
 proc getCategory*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[SpotifyResponse[Category]] {.multisync.} =
+  id: string, country, locale = ""): Future[SpotifyResponse[Category]] {.multisync.} =
   let
-    path = buildPath(subex(GetCategoryPath) % [id], @[])
+    path = buildPath(subex(GetCategoryPath) % [id], @[
+      newQuery("country", country),
+      newQuery("locale", locale),
+    ])
     response = await client.request(path)
   result = await toResponse[Category](response)
 
 proc getCategoryPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[SpotifyResponse[Paging[SimplePlaylist]]] {.multisync.} =
+  id: string, country = "",
+  limit = 20, offset = 0): Future[SpotifyResponse[Paging[SimplePlaylist]]] {.multisync.} =
   let
-    path = buildPath(subex(GetCategoryPlaylistsPath) % [id], @[])
+    path = buildPath(subex(GetCategoryPlaylistsPath) % [id], @[
+      newQuery("country", country),
+      newQuery("limit", $limit),
+      newQuery("offset", $offset)
+    ])
     response = await client.request(path)
     body = await response.body
     code = response.code
