@@ -35,9 +35,9 @@ type
     TypePlaylist = "playlist"
     TypeTrack = "track"
 
-proc search*(client: SpotifyClient | AsyncSpotifyClient,
-  q: string, searchTypes: seq[SearchType], market = "",
-  limit = 20, offset = 0): Future[SpotifyResponse[SearchResult]] {.multisync.} =
+proc internalSearch(client: SpotifyClient | AsyncSpotifyClient,
+  q: string, searchTypes: seq[SearchType], market: string,
+  limit, offset: int, includeExternal: string): Future[SpotifyResponse[SearchResult]] {.multisync.} =
   let
     path = buildPath(SearchPath, @[
       newQuery("q", q),
@@ -46,7 +46,18 @@ proc search*(client: SpotifyClient | AsyncSpotifyClient,
         .foldr(a & "," & b)),
       newQuery("market", market),
       newQuery("limit", $limit),
-      newQuery("offset", $offset)
+      newQuery("offset", $offset),
+      newQuery("include_external", includeExternal)
     ])
     response = await client.request(path)
   result = await toResponse[SearchResult](response)
+
+proc search*(client: SpotifyClient | AsyncSpotifyClient,
+  q: string, searchTypes: seq[SearchType], market = "",
+  limit = 20, offset = 0): Future[SpotifyResponse[SearchResult]] {.multisync.} =
+  result = await client.internalSearch(q, searchTypes, market, limit, offset, "")
+
+proc searchWithAudio*(client: SpotifyClient | AsyncSpotifyClient,
+  q: string, searchTypes: seq[SearchType], market = "",
+  limit = 20, offset = 0): Future[SpotifyResponse[SearchResult]] {.multisync.} =
+  result = await client.internalSearch(q, searchTypes, market, limit, offset, "audio")
