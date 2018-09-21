@@ -16,14 +16,17 @@
 
 import subexes
 import sequtils
+import httpcore
 import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
 import objects / album
+import objects / error
 import objects / paging
 import objects / copyright
 import objects / simpletrack
+import objects / spotifyresponse
 import objects / jsonunmarshaller
 import objects / internalunmarshallers
 
@@ -33,15 +36,16 @@ const
   GetAlbumsPath = "/albums"
 
 proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string, market = ""): Future[Album] {.multisync.} =
+  id: string, market = ""): Future[SpotifyResponse[Album]] {.multisync.} =
   let
     path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
     response = await client.request(path)
-    body = await response.body
-  result = to[Album](newJsonUnmarshaller(copyrightReplaceTargets), body)
+    unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
+  result = await toResponse[Album](unmarshaller, response)
 
 proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string, limit = 20, offset = 0, market = ""): Future[Paging[SimpleTrack]] {.multisync.} =
+  id: string, limit = 20, offset = 0,
+  market = ""): Future[SpotifyResponse[Paging[SimpleTrack]]] {.multisync.} =
   let
     path = buildPath(subex(GetTracksPath) % [id], @[
       newQuery("market", market),
@@ -49,11 +53,10 @@ proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("offset", $offset)
     ])
     response = await client.request(path)
-    body = await response.body
-  result = to[Paging[SimpleTrack]](newJsonUnmarshaller(), body)
+  result = await toResponse[Paging[SimpleTrack]](response)
 
 proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
-  ids: seq[string] = @[], market = ""): Future[seq[Album]] {.multisync.} =
+  ids: seq[string] = @[], market = ""): Future[SpotifyResponse[seq[Album]]] {.multisync.} =
   let
     path = buildpath(GetAlbumsPath, @[
       newQuery("ids", ids.foldr(a & "," & b)),
@@ -61,4 +64,9 @@ proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = toSeq[Album](newJsonUnmarshaller(copyrightReplaceTargets), body, "albums")
+    unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
+    code = response.code
+  if code.is2xx:
+    result = success(code, toSeq[Album](unmarshaller, body, "albums"))
+  else:
+    result = failure[seq[Album]](code, body)

@@ -20,10 +20,12 @@ import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
+import objects / error
 import objects / paging
 import objects / category
 import objects / simplealbum
 import objects / simpleplaylist
+import objects / spotifyresponse
 import objects / recommendations
 import objects / jsonunmarshaller
 import objects / featuredplaylists
@@ -38,23 +40,27 @@ const
   GetRecommendationsPath = "/recommendations"
 
 proc getCategory*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[Category] {.multisync.} =
+  id: string): Future[SpotifyResponse[Category]] {.multisync.} =
   let
     path = buildPath(subex(GetCategoryPath) % [id], @[])
     response = await client.request(path)
-    body = await response.body
-  result = to[Category](newJsonUnmarshaller(), body)
+  result = await toResponse[Category](response)
 
 proc getCategoryPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[Paging[SimplePlaylist]] {.multisync.} =
+  id: string): Future[SpotifyResponse[Paging[SimplePlaylist]]] {.multisync.} =
   let
     path = buildPath(subex(GetCategoryPlaylistsPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = to[Paging[SimplePlaylist]](newJsonUnmarshaller(), body, "playlists")
+    code = response.code
+  if code.is2xx:
+    result = success(code, to[Paging[SimplePlaylist]](body, "playlists"))
+  else:
+    result = failure[Paging[SimplePlaylist]](code, body)
 
 proc getCategories*(client: SpotifyClient | AsyncSpotifyClient,
-  country, locale = "", limit = 20, offset = 0): Future[Paging[Category]] {.multisync.} =
+  country, locale = "", limit = 20,
+  offset = 0): Future[SpotifyResponse[Paging[Category]]] {.multisync.} =
   let
     path = buildPath(GetCategoriesPath, @[
       newQuery("country", country),
@@ -64,10 +70,15 @@ proc getCategories*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = to[Paging[Category]](newJsonUnmarshaller(), body, "categories")
+    code = response.code
+  if code.is2xx:
+    result = success(code, to[Paging[Category]](body, "categories"))
+  else:
+    result = failure[Paging[Category]](code, body)
 
 proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
-  country, locale, timestamp = "", limit = 20, offset = 0): Future[FeaturedPlaylists] {.multisync.} =
+  country, locale, timestamp = "", limit = 20,
+  offset = 0): Future[SpotifyResponse[FeaturedPlaylists]] {.multisync.} =
   let
     path = buildPath(GetFeaturedPlaylistsPath, @[
       newQuery("locale", locale),
@@ -77,11 +88,11 @@ proc getFeaturedPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("offset", $offset)
     ])
     response = await client.request(path)
-    body = await response.body
-  result = to[FeaturedPlaylists](newJsonUnmarshaller(), body)
+  result = await toResponse[FeaturedPlaylists](response)
 
 proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
-  country = "", limit = 20, offset = 0): Future[Paging[SimpleAlbum]] {.multisync.} =
+  country = "", limit = 20,
+  offset = 0): Future[SpotifyResponse[Paging[SimpleAlbum]]] {.multisync.} =
   let
     path = buildPath(GetNewReleasesPath, @[
       newQuery("country", country),
@@ -90,6 +101,10 @@ proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
     ])
     response = await client.request(path)
     body = await response.body
-  result = to[Paging[SimpleAlbum]](newJsonUnmarshaller(), body, "albums")
+    code = response.code
+  if code.is2xx:
+    result = success(code, to[Paging[SimpleAlbum]](body, "albums"))
+  else:
+    result = failure[Paging[SimpleAlbum]](code, body)
 
 # proc getRecommendations*(client: SpotifyClient | AsyncSpotifyClient): Future[Recommendations] {.multisync.} =

@@ -21,9 +21,10 @@ import httpclient
 import spotifyclient
 import asyncdispatch
 import objects / track
+import objects / error
 import objects / audiofeature
 import objects / audioanalysis
-import objects / jsonunmarshaller
+import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
@@ -34,45 +35,51 @@ const
   GetTracksPath = "/tracks"
 
 proc getAudioAnalysis*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[AudioAnalysis] {.multisync.} =
+  id: string): Future[SpotifyResponse[AudioAnalysis]] {.multisync.} =
   let
     path = buildPath(subex(GetAudioAnalysisPath) % [id], @[])
     response = await client.request(path)
     body = await response.body
-  result = to[AudioAnalysis](newJsonUnmarshaller(), body)
+  result = await toResponse[AudioAnalysis](response)
 
 proc getAudioFeature*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string): Future[AudioFeature] {.multisync.} =
+  id: string): Future[SpotifyResponse[AudioFeature]] {.multisync.} =
   let
     path = buildPath(subex(GetAudioFeaturePath) % [id], @[])
     response = await client.request(path)
-    body = await response.body
-  result = to[AudioFeature](newJsonUnmarshaller(), body)
+  result = await toResponse[AudioFeature](response)
 
 proc getAudioFeatures*(client: SpotifyClient | AsyncSpotifyClient,
-  ids: seq[string]): Future[seq[AudioFeature]] {.multisync.} =
+  ids: seq[string]): Future[SpotifyResponse[seq[AudioFeature]]] {.multisync.} =
   let
     path = buildPath(GetAudioFeaturesPath, @[
       newQuery("ids", ids.foldr(a & "," & b)),
     ])
     response = await client.request(path)
     body = await response.body
-  result = toSeq[AudioFeature](newJsonUnmarshaller(), body, "audio_features")
+    code = response.code
+  if code.is2xx:
+    result = success(code, toSeq[AudioFeature](body, "audio_features"))
+  else:
+    result = failure[seq[AudioFeature]](code, body)
 
 proc getTrack*(client: SpotifyClient | AsyncSpotifyClient,
-  id: string, market = ""): Future[Track] {.multisync.} =
+  id: string, market = ""): Future[SpotifyResponse[Track]] {.multisync.} =
   let
     path = buildPath(subex(GetTrackPath) % [id], @[])
     response = await client.request(path)
-    body = await response.body
-  result = to[Track](newJsonUnmarshaller(), body)
+  result = await toResponse[Track](response)
 
 proc getTracks*(client: SpotifyClient | AsyncSpotifyClient,
-  ids: seq[string], market = ""): Future[seq[Track]] {.multisync.} =
+  ids: seq[string], market = ""): Future[SpotifyResponse[seq[Track]]] {.multisync.} =
   let
     path = buildPath(GetTracksPath, @[
       newQuery("ids", ids.foldr(a & "," & b)),
     ])
     response = await client.request(path)
     body = await response.body
-  result = toSeq[Track](newJsonUnmarshaller(), body, "tracks")
+    code = response.code
+  if code.is2xx:
+    result = success(code, toSeq[Track](body, "tracks"))
+  else:
+    result = failure[seq[Track]](code, body)

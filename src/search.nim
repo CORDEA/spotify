@@ -19,8 +19,9 @@ import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
+import objects / error
 import objects / searchresult
-import objects / jsonunmarshaller
+import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
@@ -35,7 +36,7 @@ type
 
 proc search*(client: SpotifyClient | AsyncSpotifyClient,
   q: string, searchTypes: seq[SearchType], market = "",
-  limit = 20, offset = 0): Future[SearchResult] {.multisync.} =
+  limit = 20, offset = 0): Future[SpotifyResponse[SearchResult]] {.multisync.} =
   let
     path = buildPath(SearchPath, @[
       newQuery("q", q),
@@ -47,5 +48,4 @@ proc search*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("offset", $offset)
     ])
     response = await client.request(path)
-    body = await response.body
-  result = to[SearchResult](newJsonUnmarshaller(), body)
+  result = await toResponse[SearchResult](response)

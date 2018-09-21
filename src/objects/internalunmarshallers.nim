@@ -40,7 +40,7 @@ proc replaceCommonFields(unmarshaller: JsonUnmarshaller,
   else:
     before.toSnakeCase()
 
-proc unmarshal*[T: enum](unmarshaller: JsonUnmarshaller,
+proc unmarshal[T: enum](unmarshaller: JsonUnmarshaller,
   node: JsonNode, v: var T) =
   v = parseEnum[T](node.getStr)
 
@@ -66,7 +66,7 @@ proc unmarshalBasicTypes[K, V](unmarshaller: JsonUnmarshaller,
   else:
     return v
 
-proc unmarshal*[T: ref object](unmarshaller: JsonUnmarshaller,
+proc unmarshal[T: ref object](unmarshaller: JsonUnmarshaller,
   node: JsonNode, data: var seq[T]) =
   when T is ExternalUrl:
     var t = new(T)
@@ -108,12 +108,19 @@ proc to*[T : ref object](unmarshaller: JsonUnmarshaller,
   let node = json.parseJson()
   unmarshaller.unmarshal(node[key], result)
 
-proc toSeq*[T: ref object](unmarshaller: JsonUnmarshaller,
-  json: string): seq[T] =
+proc to*[T : ref object](json, key: string): T =
   let node = json.parseJson()
-  unmarshaller.unmarshal(node, result)
+  emptyJsonUnmarshaller.unmarshal(node[key], result)
+
+proc toSeq*[T: ref object](json: string): seq[T] =
+  let node = json.parseJson()
+  emptyJsonUnmarshaller.unmarshal(node, result)
 
 proc toSeq*[T: ref object](unmarshaller: JsonUnmarshaller,
   json, key: string): seq[T] =
   let node = json.parseJson()
   unmarshaller.unmarshal(node[key], result)
+
+proc toSeq*[T: ref object](json, key: string): seq[T] =
+  let node = json.parseJson()
+  emptyJsonUnmarshaller.unmarshal(node[key], result)

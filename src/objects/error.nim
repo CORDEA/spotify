@@ -12,18 +12,9 @@
 # limitations under the License.
 
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
-# date  : 2018-09-12
+# date  : 2018-09-04
 
 type
-  ReplaceTarget* = ref object
-    fieldName*, jsonKeyName*: string
-  JsonUnmarshaller* = ref object
-    replaceTargets*: seq[ReplaceTarget]
-
-proc newJsonUnmarshaller*(replaceTargets: seq[ReplaceTarget] = @[]): JsonUnmarshaller =
-  JsonUnmarshaller(replaceTargets: replaceTargets)
-
-proc newReplaceTarget*(fieldName, jsonKeyName: string): ReplaceTarget =
-  ReplaceTarget(fieldName: fieldName, jsonKeyName: jsonKeyName)
-
-let emptyJsonUnmarshaller* = newJsonUnmarshaller()
+  Error* = ref object
+    status*: int
+    message*: string

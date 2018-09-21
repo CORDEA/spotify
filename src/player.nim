@@ -19,12 +19,14 @@ import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
+import objects / error
 import objects / device
 import objects / playhistory
-import objects / currentlyplayingtrack
-import objects / currentlyplayingcontext
+import objects / spotifyresponse
 import objects / jsonunmarshaller
 import objects / internalunmarshallers
+import objects / currentlyplayingtrack
+import objects / currentlyplayingcontext
 
 const
   GetUserDevicesPath = "/me/player/devices"
@@ -41,22 +43,28 @@ const
   ShufflePath = "/me/player/shuffle"
   TransferPlaybackPath = "/me/player"
 
-proc getUserDevices*(client: SpotifyClient | AsyncSpotifyClient): Future[seq[Device]] {.multisync.} =
+proc getUserDevices*(client: SpotifyClient | AsyncSpotifyClient
+  ): Future[SpotifyResponse[seq[Device]]] {.multisync.} =
   let
     response = await client.request(GetUserDevicesPath)
     body = await response.body
-  result = toSeq[Device](newJsonUnmarshaller(deviceReplaceTargets), body, "devices")
+    code = response.code
+    unmarshaller = newJsonUnmarshaller(deviceReplaceTargets)
+  if code.is2xx:
+    result = success(code, toSeq[Device](unmarshaller, body, "devices"))
+  else:
+    result = failure[seq[Device]](code, body)
 
 proc getUserCurrentlyPlayingContext*(client: SpotifyClient | AsyncSpotifyClient,
-  market = ""): Future[CurrentlyPlayingContext] {.multisync.} =
+  market = ""): Future[SpotifyResponse[CurrentlyPlayingContext]] {.multisync.} =
   let
     path = buildPath(GetUserCurrentlyPlayingContextPath, @[newQuery("market", market)])
     response = await client.request(path)
-    body = await response.body
-  result = to[CurrentlyPlayingContext](newJsonUnmarshaller(deviceReplaceTargets), body)
+    unmarshaller = newJsonUnmarshaller(deviceReplaceTargets)
+  result = await toResponse[CurrentlyPlayingContext](unmarshaller, response)
 
 proc getUserRecentlyPlayedTracks*(client: SpotifyClient | AsyncSpotifyClient,
-  limit = 20, after, before = 0): Future[PlayHistory] {.multisync.} =
+  limit = 20, after, before = 0): Future[SpotifyResponse[PlayHistory]] {.multisync.} =
   var queries = @[newQuery("limit", $limit)]
   if after > 0:
     queries.add(newQuery("after", $after))
@@ -65,72 +73,88 @@ proc getUserRecentlyPlayedTracks*(client: SpotifyClient | AsyncSpotifyClient,
   let
     path = buildPath(GetUserRecentlyPlayedTracksPath, queries)
     response = await client.request(path)
-    body = await response.body
-  result = to[PlayHistory](newJsonUnmarshaller(), body)
+  result = await toResponse[PlayHistory](response)
 
 proc getUserCurrentlyPlayingTrack*(client: SpotifyClient | AsyncSpotifyClient,
-  market = ""): Future[CurrentlyPlayingTrack] {.multisync.} =
+  market = ""): Future[SpotifyResponse[CurrentlyPlayingTrack]] {.multisync.} =
   let
     path = buildPath(GetUserCurrentlyPlayingTrackPath, @[newQuery("market", market)])
     response = await client.request(path)
-    body = await response.body
-  result = to[CurrentlyPlayingTrack](newJsonUnmarshaller(), body)
+  result = await toResponse[CurrentlyPlayingTrack](response)
 
 proc pause*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(PausePath, @[newQuery("device_id", deviceId)])
-  discard await client.request(path, httpMethod = HttpPut)
+  deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(PausePath, @[newQuery("device_id", deviceId)])
+    response = await client.request(path, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)
 
 proc seek*(client: SpotifyClient | AsyncSpotifyClient,
-  positionMs: int, deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(SeekPath, @[
-    newQuery("position_ms", $positionMs),
-    newQuery("device_id", deviceId)
-  ])
-  discard await client.request(path, httpMethod = HttpPut)
+  positionMs: int, deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(SeekPath, @[
+      newQuery("position_ms", $positionMs),
+      newQuery("device_id", deviceId)
+    ])
+    response = await client.request(path, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)
 
 proc setRepeat*(client: SpotifyClient | AsyncSpotifyClient,
-  state: RepeatState, deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(SetRepeatPath, @[
-    newQuery("state", $state),
-    newQuery("device_id", deviceId)
-  ])
-  discard await client.request(path, httpMethod = HttpPut)
+  state: RepeatState, deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(SetRepeatPath, @[
+      newQuery("state", $state),
+      newQuery("device_id", deviceId)
+    ])
+    response = await client.request(path, httpMethod = HttpPut)
+    body = await response.body
+  result = await toEmptyResponse(response)
 
 proc setVolume*(client: SpotifyClient | AsyncSpotifyClient,
-  volumePercent: int, deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(SetVolumePath, @[
-    newQuery("volume_percent", $volumePercent),
-    newQuery("device_id", deviceId)
-  ])
-  discard await client.request(path, httpMethod = HttpPut)
+  volumePercent: int, deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(SetVolumePath, @[
+      newQuery("volume_percent", $volumePercent),
+      newQuery("device_id", deviceId)
+    ])
+    response = await client.request(path, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)
 
 proc next*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(NextPath, @[newQuery("device_id", deviceId)])
-  discard await client.request(path, httpMethod = HttpPost)
+  deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(NextPath, @[newQuery("device_id", deviceId)])
+    response =await client.request(path, httpMethod = HttpPost)
+  result = await toEmptyResponse(response)
 
 proc previous*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(PreviousPath, @[newQuery("device_id", deviceId)])
-  discard await client.request(path, httpMethod = HttpPost)
+  deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(PreviousPath, @[newQuery("device_id", deviceId)])
+    response = await client.request(path, httpMethod = HttpPost)
+  result = await toEmptyResponse(response)
 
 proc play*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(PlayPath, @[newQuery("device_id", deviceId)])
-  discard await client.request(path, httpMethod = HttpPut)
+  deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(PlayPath, @[newQuery("device_id", deviceId)])
+    response = await client.request(path, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)
 
 proc shuffle*(client: SpotifyClient | AsyncSpotifyClient,
-  shuffle: bool, deviceId = ""): Future[void] {.multisync.} =
-  let path = buildPath(ShufflePath, @[
-    newQuery("state", $shuffle),
-    newQuery("device_id", deviceId)
-  ])
-  discard await client.request(path, httpMethod = HttpPut)
+  shuffle: bool, deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    path = buildPath(ShufflePath, @[
+      newQuery("state", $shuffle),
+      newQuery("device_id", deviceId)
+    ])
+    response = await client.request(path, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)
 
 proc transferPlayback*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceIds: seq[string], play = false): Future[void] {.multisync.} =
-  let body = %* {"device_ids": deviceIds, "play": play}
-  let response = await client.request(TransferPlaybackPath,
-    body = $body, httpMethod = HttpPut)
-  discard await client.request(PlayPath, body = $body, httpMethod = HttpPut)
+  deviceIds: seq[string], play = false): Future[SpotifyResponse[void]] {.multisync.} =
+  let
+    body = %* {"device_ids": deviceIds, "play": play}
+    response = await client.request(TransferPlaybackPath,
+      body = $body, httpMethod = HttpPut)
+  result = await toEmptyResponse(response)

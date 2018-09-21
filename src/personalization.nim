@@ -19,10 +19,11 @@ import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
+import objects / error
 import objects / track
 import objects / artist
 import objects / paging
-import objects / jsonunmarshaller
+import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
@@ -36,24 +37,23 @@ type
 
 proc internalGet(client: SpotifyClient | AsyncSpotifyClient,
   getType: string, limit = 20, offset = 0,
-  timeRange = TypeMediumTerm): Future[string] {.multisync.} =
+  timeRange = TypeMediumTerm): Future[Response | AsyncResponse] {.multisync.} =
   let
     path = buildPath(subex(GetUserTopDataPath) % [getType], @[
       newQuery("limit", $limit),
       newQuery("offset", $offset),
       newQuery("time_range", $timeRange)
     ])
-    response = await client.request(path)
-  result = await response.body
+  result = await client.request(path)
 
 proc getUserTopArtists*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, offset = 0,
-  timeRange = TypeMediumTerm): Future[Paging[Artist]] {.multisync.} =
-  let body = await client.internalGet("artists")
-  result = to[Paging[Artist]](newJsonUnmarshaller(), body)
+  timeRange = TypeMediumTerm): Future[SpotifyResponse[Paging[Artist]]] {.multisync.} =
+  let response = await client.internalGet("artists")
+  result = await toResponse[Paging[Artist]](response)
 
 proc getUserTopTracks*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, offset = 0,
-  timeRange = TypeMediumTerm): Future[Paging[Track]] {.multisync.} =
-  let body = await client.internalGet("tracks")
-  result = to[Paging[Track]](newJsonUnmarshaller(), body)
+  timeRange = TypeMediumTerm): Future[SpotifyResponse[Paging[Track]]] {.multisync.} =
+  let response = await client.internalGet("tracks")
+  result = await toResponse[Paging[Track]](response)
