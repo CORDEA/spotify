@@ -134,12 +134,38 @@ proc previous*(client: SpotifyClient | AsyncSpotifyClient,
     response = await client.request(path, httpMethod = HttpPost)
   result = await toEmptyResponse(response)
 
-proc play*(client: SpotifyClient | AsyncSpotifyClient,
-  deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
+proc internalPlay(client: SpotifyClient | AsyncSpotifyClient,
+  deviceId: string, body: JsonNode): Future[SpotifyResponse[void]] {.multisync.} =
   let
     path = buildPath(PlayPath, @[newQuery("device_id", deviceId)])
-    response = await client.request(path, httpMethod = HttpPut)
+    response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
+
+proc play*(client: SpotifyClient | AsyncSpotifyClient,
+  deviceId, contextUri = "", uris: seq[string] = @[],
+  offsetPosition, positionMs = -1): Future[SpotifyResponse[void]] {.multisync.} =
+  var body = %* {
+    "context_uri": contextUri,
+    "uris": uris
+  }
+  if offsetPosition >= 0:
+    body["offset"] = %* {"position": offsetPosition}
+  if positionMs >= 0:
+    body["position_ms"] = %* positionMs
+  result = await client.internalPlay(deviceId, body)
+
+proc play*(client: SpotifyClient | AsyncSpotifyClient,
+  deviceId, contextUri = "", uris: seq[string] = @[],
+  offsetUri = "", positionMs = -1): Future[SpotifyResponse[void]] {.multisync.} =
+  var body = %* {
+    "context_uri": contextUri,
+    "uris": uris
+  }
+  if offsetUri != "":
+    body["offset"] = %* {"uri": offsetUri}
+  if positionMs >= 0:
+    body["position_ms"] = %* positionMs
+  result = await client.internalPlay(deviceId, body)
 
 proc shuffle*(client: SpotifyClient | AsyncSpotifyClient,
   shuffle: bool, deviceId = ""): Future[SpotifyResponse[void]] {.multisync.} =
