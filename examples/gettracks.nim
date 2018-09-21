@@ -26,19 +26,19 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  audioAnalysis = client.getAudioAnalysis("3JIxjvbbDrA9ztYlNcp3yL")
-  audioFeature = client.getAudioFeature("06AKEBrKUckW0KREUWRnvT")
+  audioAnalysis = client.getAudioAnalysis("3JIxjvbbDrA9ztYlNcp3yL").data
+  audioFeature = client.getAudioFeature("06AKEBrKUckW0KREUWRnvT").data
   audioFeatures = client.getAudioFeatures(@[
     "4JpKVNYnVcJ8tuMKjAj50A",
     "2NRANZE9UCmPAS5XVbXL40",
     "24JygzOLM0EmRQeGtFcIcG"
-  ])
-  track = client.getTrack("11dFghVXANMlKmJXsNCbNl")
+  ]).data
+  track = client.getTrack("11dFghVXANMlKmJXsNCbNl").data
   tTracks = client.getTracks(@[
     "11dFghVXANMlKmJXsNCbNl",
     "20I6sIOMTCkB6w7ryavxtO",
     "7xGfFoTpQ2E7fRF5lN10tr"
-  ])
+  ]).data
 
 echo audioAnalysis.meta.platform
 echo $audioAnalysis.bars.len

@@ -29,9 +29,9 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  album = client.getAlbum(target)
-  tracks = client.getAlbumTracks(target)
-  deAlbums = client.getAlbums(@[target, "53A0W3U0s8diEn9RhXQhVz"], "DE")
+  album = client.getAlbum(target).data
+  tracks = client.getAlbumTracks(target).data
+  deAlbums = client.getAlbums(@[target, "53A0W3U0s8diEn9RhXQhVz"], "DE").data
 
 echo album.albumType
 for artist in album.artists:

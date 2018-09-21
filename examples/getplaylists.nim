@@ -31,10 +31,10 @@ let
     @[ScopePlaylistReadPrivate, ScopePlaylistModifyPublic]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  ownPlaylists = client.getUserPlaylists()
-  userPlaylists = client.getPlaylists("wizzler")
-  playlistTracks = client.getPlaylistTracks("21THa8j9TaSGuXYNBU5tsC")
-  playlist = client.getPlaylist(testPlaylistId)
+  ownPlaylists = client.getUserPlaylists().data
+  userPlaylists = client.getPlaylists("wizzler").data
+  playlistTracks = client.getPlaylistTracks("21THa8j9TaSGuXYNBU5tsC").data
+  playlist = client.getPlaylist(testPlaylistId).data
 
 for p in ownPlaylists.items:
   echo p.name
@@ -50,24 +50,26 @@ for track in playlistTracks.items:
 let snapshot = client.postTracksToPlaylist(testPlaylistId, @[
   "spotify:track:4iV5W9uYEdYUVa79Axb7Rh",
   "spotify:track:1301WleyT98MSxVHPZCA6M"
-])
+]).data
 echo snapshot.snapshotId
 
-client.changePlaylistDetails(testPlaylistId, "Test playlist")
+let changedPlaylist = client.changePlaylistDetails(testPlaylistId, "Test playlist")
+echo changedPlaylist.isSuccess
 
-let postedPlaylist = client.postPlaylist(ownId, "Test2")
+let postedPlaylist = client.postPlaylist(ownId, "Test2").data
 echo postedPlaylist.name
 
 let deleteSnapshot = client.deleteTracksFromPlaylist(testPlaylistId, @[
   "spotify:track:4iV5W9uYEdYUVa79Axb7Rh",
   "spotify:track:1301WleyT98MSxVHPZCA6M"
-])
+]).data
 echo deleteSnapshot.snapshotId
 
-let reorderSnapshot = client.reorderPlaylistTracks(testPlaylistId, 2, 0)
+let reorderSnapshot = client.reorderPlaylistTracks(testPlaylistId, 2, 0).data
 echo reorderSnapshot.snapshotId
 
-client.replacePlaylistTracks(testPlaylistId, @[
+let replacedPlaylist = client.replacePlaylistTracks(testPlaylistId, @[
   "spotify:track:4iV5W9uYEdYUVa79Axb7Rh",
   "spotify:track:1301WleyT98MSxVHPZCA6M"
 ])
+echo replacedPlaylist.isSuccess

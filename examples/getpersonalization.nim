@@ -27,8 +27,8 @@ let
     @[ScopeUserTopRead]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  artists = client.getUserTopArtists()
-  tracks = client.getUserTopTracks()
+  artists = client.getUserTopArtists().data
+  tracks = client.getUserTopTracks().data
 
 for artist in artists.items:
   echo artist.name

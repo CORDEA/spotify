@@ -28,9 +28,9 @@ let
     @[ScopeUserReadPlaybackState, ScopeUserReadRecentlyPlayed, ScopeUserReadCurrentlyPlaying, ScopeUserModifyPlaybackState]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  devices = client.getUserDevices()
-  context = client.getUserCurrentlyPlayingContext()
-  track = client.getUserCurrentlyPlayingTrack()
+  devices = client.getUserDevices().data
+  context = client.getUserCurrentlyPlayingContext().data
+  track = client.getUserCurrentlyPlayingTrack().data
 
 for device in devices:
   echo device.id
@@ -42,14 +42,25 @@ echo context.isPlaying
 echo track.item.name
 echo track.progressMs
 
-client.pause()
-client.seek(track.progressMs + 5000)
-client.setRepeat(StateTrack)
-client.setVolume(0)
-client.next()
-client.previous()
-client.play()
-client.shuffle(true)
+let
+  pause = client.pause()
+  seek = client.seek(track.progressMs + 5000)
+  repeat = client.setRepeat(StateTrack)
+  volume = client.setVolume(0)
+  next = client.next()
+  previous = client.previous()
+  play = client.play()
+  shuffle = client.shuffle(true)
+
+echo pause.isSuccess
+echo seek.isSuccess
+echo repeat.isSuccess
+echo volume.isSuccess
+echo next.isSuccess
+echo previous.isSuccess
+echo play.isSuccess
+echo shuffle.isSuccess
 
 if devices.len > 1:
-  client.transferPlayback(@[devices[1].id])
+  let transfer = client.transferPlayback(@[devices[1].id])
+  echo transfer.isSuccess

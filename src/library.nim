@@ -23,9 +23,11 @@ import spotifyclient
 import asyncdispatch
 import objects / error
 import objects / paging
+import objects / copyright
 import objects / savedalbum
 import objects / savedtrack
 import objects / spotifyresponse
+import objects / jsonunmarshaller
 import objects / internalunmarshallers
 
 const
@@ -73,8 +75,9 @@ proc getSavedAlbums*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("limit", $limit),
       newQuery("offset", $offset)
     ])
+    unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
     response = await client.request(path)
-  result = await toResponse[Paging[SavedAlbum]](response)
+  result = await toResponse[Paging[SavedAlbum]](unmarshaller, response)
 
 proc getSavedTracks*(client: SpotifyClient | AsyncSpotifyClient,
   limit = 20, offset = 0,

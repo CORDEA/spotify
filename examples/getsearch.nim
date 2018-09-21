@@ -26,7 +26,7 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  searchResult = client.search("ed sheeran", @[TypeAlbum, TypeArtist, TypePlaylist, TypeTrack])
+  searchResult = client.search("ed sheeran", @[TypeAlbum, TypeArtist, TypePlaylist, TypeTrack]).data
 
 for album in searchResult.albums.items:
   echo album.name

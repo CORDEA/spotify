@@ -18,7 +18,7 @@ import track
 import artist
 import paging
 import simplealbum
-import simplePlaylist
+import simpleplaylist
 
 type
   SearchResult* = ref object

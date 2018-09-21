@@ -26,11 +26,11 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  category = client.getCategory("party")
-  playlists = client.getCategoryPlaylists("party")
-  categories = client.getCategories()
-  featuredPlaylists = client.getFeaturedPlaylists()
-  newReleases = client.getNewReleases()
+  category = client.getCategory("party").data
+  playlists = client.getCategoryPlaylists("party").data
+  categories = client.getCategories().data
+  featuredPlaylists = client.getFeaturedPlaylists().data
+  newReleases = client.getNewReleases().data
 
 echo category.name
 

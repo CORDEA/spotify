@@ -31,10 +31,10 @@ let
     @[ScopeUserLibraryRead, ScopeUserLibraryModify]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  isSavedAlbums = client.isSavedAlbums(targetAlbums)
-  isSavedTracks = client.isSavedTracks(targetTracks)
-  savedAlbums = client.getSavedAlbums()
-  savedTracks = client.getSavedTracks()
+  isSavedAlbums = client.isSavedAlbums(targetAlbums).data
+  isSavedTracks = client.isSavedTracks(targetTracks).data
+  savedAlbums = client.getSavedAlbums().data
+  savedTracks = client.getSavedTracks().data
 
 echo $isSavedAlbums
 echo $isSavedTracks
@@ -45,8 +45,17 @@ for album in savedAlbums.items:
 for track in savedTracks.items:
   echo track.track.name
 
-client.saveAlbums(targetAlbums)
-client.saveTracks(targetTracks)
+let
+  savedAlbum = client.saveAlbums(targetAlbums)
+  savedTrack = client.saveTracks(targetTracks)
 
-client.deleteSavedAlbums(targetAlbums)
-client.deleteSavedTracks(targetTracks)
+echo savedAlbum.isSuccess
+echo $savedAlbum.code
+echo savedTrack.isSuccess
+
+let
+  deletedAlbum = client.deleteSavedAlbums(targetAlbums)
+  deletedTrack = client.deleteSavedTracks(targetTracks)
+
+echo deletedAlbum.isSuccess
+echo deletedTrack.isSuccess

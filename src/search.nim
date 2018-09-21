@@ -21,6 +21,7 @@ import spotifyclient
 import asyncdispatch
 import objects / error
 import objects / searchresult
+import objects / simpleplaylist
 import objects / spotifyresponse
 import objects / internalunmarshallers
 

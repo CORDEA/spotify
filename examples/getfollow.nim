@@ -32,10 +32,10 @@ let
     @[ScopeUserFollowRead, ScopeUserFollowModify, ScopePlaylistModifyPublic]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  isFollowArtist = client.isFollowArtist(artists)
-  isFollowUser = client.isFollowUser(users)
-  isFollowPlaylist = client.isFollowPlaylist("jmperezperez", playlist, @["possan", "elogain"])
-  followedArtists = client.getFollowedArtists()
+  isFollowArtist = client.isFollowArtist(artists).data
+  isFollowUser = client.isFollowUser(users).data
+  isFollowPlaylist = client.isFollowPlaylist("jmperezperez", playlist, @["possan", "elogain"]).data
+  followedArtists = client.getFollowedArtists().data
 
 echo $isFollowArtist
 echo $isFollowUser
@@ -44,10 +44,24 @@ echo $isFollowPlaylist
 for artist in followedArtists.items:
   echo artist.name
 
-client.followArtist(artists)
-client.followUser(users)
-client.followPlaylist(playlist)
+let
+  followedArtist = client.followArtist(artists)
+  followedUser = client.followUser(users)
+  followedPlaylist = client.followPlaylist(playlist)
 
-client.unfollowArtist(artists)
-client.unfollowUser(users)
-client.unfollowPlaylist(playlist)
+echo followedArtist.isSuccess
+echo $followedArtist.code
+
+echo followedUser.isSuccess
+echo followedPlaylist.isSuccess
+
+let
+  unfollowedArtist = client.unfollowArtist(artists)
+  unfollowedUser = client.unfollowUser(users)
+  unfollowedPlaylist = client.unfollowPlaylist(playlist)
+
+echo unfollowedArtist.isSuccess
+echo $unfollowedArtist.code
+
+echo unfollowedUser.isSuccess
+echo unfollowedPlaylist.isSuccess

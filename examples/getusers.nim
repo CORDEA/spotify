@@ -27,8 +27,8 @@ let
     @[ScopeUserReadPrivate]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  user = client.getCurrentUser()
-  wizzler = client.getUser("wizzler")
+  user = client.getCurrentUser().data
+  wizzler = client.getUser("wizzler").data
 
 echo user.id
 echo user.country

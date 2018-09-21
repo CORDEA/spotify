@@ -28,11 +28,11 @@ let
     @[]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
-  artist = client.getArtist(target)
-  albums = client.getArtistAlbums(target)
-  tracks = client.getArtistTopTracks(target, "DE")
-  relatedArtists = client.getArtistRelatedArtists(target)
-  artistsResult = client.getArtists(@[target, "0oSGxfWSnnOXhD2fKuz2Gy"])
+  artist = client.getArtist(target).data
+  albums = client.getArtistAlbums(target).data
+  tracks = client.getArtistTopTracks(target, "DE").data
+  relatedArtists = client.getArtistRelatedArtists(target).data
+  artistsResult = client.getArtists(@[target, "0oSGxfWSnnOXhD2fKuz2Gy"]).data
 
 echo artist.name
 echo artist.popularity
