@@ -4,6 +4,38 @@
 
 A Nim wrapper for the Spotify Web API.
 
+## Usage
+
+This package supports authorization code grant and client credentials grant.
+
+```nim
+let
+  token = newHttpClient().authorizationCodeGrant(
+    "SPOTIFY_ID",
+    "SPOTIFY_SECRET",
+    @[SCOPES]
+  )
+  client = newSpotifyClient(token)
+```
+
+Or in your own way...
+
+```nim
+let client = newSpotifyClient(
+  newSpotifyToken("ACCESS_TOKEN", "REFRESH_TOKEN (optional)", "EXPIRES_IN (optional)"))
+```
+
+And
+
+```nim
+let user = client.getCurrentUser()
+
+if user.isSuccess:
+  echo user.data.id
+else:
+  echo user.error.message
+```
+
 ## License
 
 ```
