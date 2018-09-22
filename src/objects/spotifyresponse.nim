@@ -42,7 +42,7 @@ proc success*(code: HttpCode): SpotifyResponse[void] =
     code: code
   )
 
-proc failure*[T](code: HttpCode, error: Error): SpotifyResponse[T] =
+proc failure[T](code: HttpCode, error: Error): SpotifyResponse[T] =
   result = SpotifyResponse[T](
     isSuccess: false,
     code: code,
@@ -53,7 +53,7 @@ proc failure*[T](code: HttpCode, body: string): SpotifyResponse[T] =
   result = SpotifyResponse[T](
     isSuccess: false,
     code: code,
-    error: to[Error](emptyJsonUnmarshaller, body)
+    error: to[Error](emptyJsonUnmarshaller, body, "error")
   )
 
 proc toResponse*[T : ref object](unmarshaller: JsonUnmarshaller,
@@ -64,7 +64,7 @@ proc toResponse*[T : ref object](unmarshaller: JsonUnmarshaller,
   if code.is2xx:
     result = success(code, to[T](unmarshaller, body))
   else:
-    result = failure[T](code, to[Error](unmarshaller, body))
+    result = failure[T](code, to[Error](unmarshaller, body, "error"))
 
 proc toResponse*[T : ref object](response: Response | AsyncResponse
   ): Future[SpotifyResponse[T]] {.multisync.} =
@@ -78,4 +78,4 @@ proc toEmptyResponse*(response: Response | AsyncResponse
   if code.is2xx:
     result = success(code)
   else:
-    result = failure[void](code, to[Error](emptyJsonUnmarshaller, body))
+    result = failure[void](code, body)
