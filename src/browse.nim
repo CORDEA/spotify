@@ -29,6 +29,7 @@ import objects / spotifyresponse
 import objects / recommendations
 import objects / jsonunmarshaller
 import objects / featuredplaylists
+import objects / recommendationseed
 import objects / internalunmarshallers
 
 const
@@ -115,4 +116,25 @@ proc getNewReleases*(client: SpotifyClient | AsyncSpotifyClient,
   else:
     result = failure[Paging[SimpleAlbum]](code, body)
 
-# proc getRecommendations*(client: SpotifyClient | AsyncSpotifyClient): Future[Recommendations] {.multisync.} =
+proc getRecommendations*(client: SpotifyClient | AsyncSpotifyClient,
+  limit = 20, market = "",
+  seedArtists, seedGenres, seedTracks: seq[string] = @[],
+  additionalQueries: seq[Query] = @[]): Future[SpotifyResponse[Recommendations]] {.multisync.} =
+  var queries = concat(@[
+    newQuery("limit", $limit),
+    newQuery("market", market)
+  ], additionalQueries)
+  if seedArtists.len > 0:
+    queries.add(newQuery("seed_artists",
+      seedArtists.foldr(a & "," & b)))
+  if seedGenres.len > 0:
+    queries.add(newQuery("seed_genres",
+      seedGenres.foldr(a & "," & b)))
+  if seedTracks.len > 0:
+    queries.add(newQuery("seed_tracks",
+      seedTracks.foldr(a & "," & b)))
+  let
+    path = buildPath(GetRecommendationsPath, queries)
+    response = await client.request(path)
+    unmarshaller = newJsonUnmarshaller(recommendationSeedReplaceTargets)
+  result = await toResponse[Recommendations](unmarshaller, response)

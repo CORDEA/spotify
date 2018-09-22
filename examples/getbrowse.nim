@@ -31,6 +31,7 @@ let
   categories = client.getCategories().data
   featuredPlaylists = client.getFeaturedPlaylists().data
   newReleases = client.getNewReleases().data
+  recommendations = client.getRecommendations(seedArtists = @["4NHQUGzhtTLFvgF5SZesLK"]).data
 
 echo category.name
 
@@ -48,3 +49,6 @@ for playlist in featuredPlaylists.playlists.items:
 
 for release in newReleases.items:
   echo release.name
+
+for seed in recommendations.seeds:
+  echo seed.href
