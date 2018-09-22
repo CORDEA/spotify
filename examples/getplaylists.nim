@@ -28,7 +28,7 @@ let
   token = newHttpClient().authorizationCodeGrant(
     getEnv("SPOTIFY_ID"),
     getEnv("SPOTIFY_SECRET"),
-    @[ScopePlaylistReadPrivate, ScopePlaylistModifyPublic]
+    @[ScopePlaylistReadPrivate, ScopePlaylistModifyPublic, ScopeUgcImageUpload]
   )
   client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
   ownPlaylists = client.getUserPlaylists().data
@@ -73,3 +73,6 @@ let replacedPlaylist = client.replacePlaylistTracks(testPlaylistId, @[
   "spotify:track:1301WleyT98MSxVHPZCA6M"
 ])
 echo replacedPlaylist.isSuccess
+
+let uploadResult = client.uploadCustomPlaylistCoverImageWithPath(testPlaylistId, "./test.jpg")
+echo uploadResult.isSuccess

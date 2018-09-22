@@ -46,3 +46,6 @@ const
   # Listening History
   ScopeUserReadRecentlyPlayed* = "user-read-recently-played"
   ScopeUserTopRead* = "user-top-read"
+
+  # Image
+  ScopeUgcImageUpload* = "ugc-image-upload"

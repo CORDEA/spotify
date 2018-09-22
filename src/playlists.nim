@@ -15,6 +15,7 @@
 # date  : 2018-09-17
 
 import json
+import base64
 import subexes
 import sequtils
 import spotifyuri
@@ -204,4 +205,15 @@ proc replacePlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
-# proc uploadCustomPlaylistCoverImage*
+proc uploadCustomPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
+  playlistId, encodedData: string): Future[SpotifyResponse[void]] {.multisync} =
+  let
+    path = buildPath(subex(UploadCustomPlaylistCoverImagePath) % [playlistId], @[])
+    response = await client.request(path, body = encodedData, httpMethod = HttpPut,
+      extraHeaders = newHttpHeaders({"Content-Type": "image/jpeg"}))
+  result = await toEmptyResponse(response)
+
+proc uploadCustomPlaylistCoverImageWithPath*(client: SpotifyClient | AsyncSpotifyClient,
+  playlistId, jpegPath: string): Future[SpotifyResponse[void]] {.multisync} =
+  result = await client.uploadCustomPlaylistCoverImage(playlistId,
+    encode(readFile(jpegPath), newLine = ""))

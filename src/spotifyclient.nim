@@ -16,6 +16,7 @@
 
 import uri
 import json
+import tables
 import oauth2
 import httpclient
 import asyncdispatch
@@ -72,7 +73,11 @@ proc authorizationCodeGrant*(client: HttpClient | AsyncHttpClient,
   result = newSpotifyToken(accessToken, refreshToken, expiresIn)
 
 proc request*(client: SpotifyClient | AsyncSpotifyClient, path: string,
-  httpMethod = HttpGet, body = ""): Future[Response | AsyncResponse] {.multisync.} =
-  let headers = getBearerRequestHeader(client.accessToken)
+  httpMethod = HttpGet, body = "",
+  extraHeaders: HttpHeaders = nil): Future[Response | AsyncResponse] {.multisync.} =
+  var headers = getBearerRequestHeader(client.accessToken)
+  if extraHeaders != nil:
+    for k, v in extraHeaders.table:
+      headers[k] = v
   result = await client.client.request($(BaseUrl.parseUri() / path),
     httpMethod = httpMethod, headers = headers, body = body)
