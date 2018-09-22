@@ -59,21 +59,37 @@ proc newSpotifyToken(json, refreshToken: string): SpotifyToken =
     expiresIn: json["expires_in"].getStr
   )
 
-proc newSpotifyClient*(accessToken, refreshToken, expiresIn: string): SpotifyClient =
-  let client = newHttpClient()
+proc newSpotifyClient*(client: HttpClient, token: SpotifyToken): SpotifyClient =
   return SpotifyClient(
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    expiresIn: expiresIn,
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    expiresIn: token.expiresIn,
     client: client
   )
 
-proc newAsyncSpotifyClient*(accessToken, refreshToken, expiresIn: string): AsyncSpotifyClient =
+proc newSpotifyClient*(token: SpotifyToken): SpotifyClient =
+  let client = newHttpClient()
+  return SpotifyClient(
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    expiresIn: token.expiresIn,
+    client: client
+  )
+
+proc newAsyncSpotifyClient*(client: AsyncHttpClient, token: SpotifyToken): AsyncSpotifyClient =
+  return AsyncSpotifyClient(
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    expiresIn: token.expiresIn,
+    client: client
+  )
+
+proc newAsyncSpotifyClient*(token: SpotifyToken): AsyncSpotifyClient =
   let client = newAsyncHttpClient()
   return AsyncSpotifyClient(
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    expiresIn: expiresIn,
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    expiresIn: token.expiresIn,
     client: client
   )
 

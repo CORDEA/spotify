@@ -31,7 +31,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopeUserFollowRead, ScopeUserFollowModify, ScopePlaylistModifyPublic]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   isFollowArtist = client.isFollowArtist(artists).data
   isFollowUser = client.isFollowUser(users).data
   isFollowPlaylist = client.isFollowPlaylist("jmperezperez", playlist, @["possan", "elogain"]).data

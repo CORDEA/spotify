@@ -24,7 +24,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   newToken = client.refreshToken(
     getEnv("SPOTIFY_ID"),
     getEnv("SPOTIFY_SECRET"),

@@ -25,7 +25,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   category = client.getCategory("party").data
   playlists = client.getCategoryPlaylists("party").data
   categories = client.getCategories().data

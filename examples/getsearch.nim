@@ -25,7 +25,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   searchResult = client.search("ed sheeran", @[TypeAlbum, TypeArtist, TypePlaylist, TypeTrack]).data
 
 for album in searchResult.albums.items:

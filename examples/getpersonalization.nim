@@ -26,7 +26,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopeUserTopRead]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   artists = client.getUserTopArtists().data
   tracks = client.getUserTopTracks().data
 

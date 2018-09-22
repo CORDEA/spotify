@@ -26,7 +26,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopeUserReadPrivate]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   user = client.getCurrentUser().data
   wizzler = client.getUser("wizzler").data
 

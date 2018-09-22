@@ -28,7 +28,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   album = client.getAlbum(target).data
   tracks = client.getAlbumTracks(target).data
   deAlbums = client.getAlbums(@[target, "53A0W3U0s8diEn9RhXQhVz"], "DE").data

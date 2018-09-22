@@ -30,7 +30,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopeUserLibraryRead, ScopeUserLibraryModify]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   isSavedAlbums = client.isSavedAlbums(targetAlbums).data
   isSavedTracks = client.isSavedTracks(targetTracks).data
   savedAlbums = client.getSavedAlbums().data

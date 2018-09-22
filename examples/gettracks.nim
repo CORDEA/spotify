@@ -25,7 +25,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   audioAnalysis = client.getAudioAnalysis("3JIxjvbbDrA9ztYlNcp3yL").data
   audioFeature = client.getAudioFeature("06AKEBrKUckW0KREUWRnvT").data
   audioFeatures = client.getAudioFeatures(@[

@@ -27,7 +27,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopeUserReadPlaybackState, ScopeUserReadRecentlyPlayed, ScopeUserReadCurrentlyPlaying, ScopeUserModifyPlaybackState]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   devices = client.getUserDevices().data
   context = client.getUserCurrentlyPlayingContext().data
   track = client.getUserCurrentlyPlayingTrack().data

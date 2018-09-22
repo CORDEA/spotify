@@ -30,7 +30,7 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[ScopePlaylistReadPrivate, ScopePlaylistModifyPublic, ScopeUgcImageUpload]
   )
-  client = newSpotifyClient(token.accessToken, token.refreshToken, token.expiresIn)
+  client = newSpotifyClient(token)
   ownPlaylists = client.getUserPlaylists().data
   userPlaylists = client.getPlaylists("wizzler").data
   playlistTracks = client.getPlaylistTracks("21THa8j9TaSGuXYNBU5tsC").data
