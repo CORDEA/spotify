@@ -43,6 +43,22 @@ proc newSpotifyToken*(accessToken, refreshToken, expiresIn: string): SpotifyToke
     expiresIn: expiresIn
   )
 
+proc newSpotifyToken(json: string): SpotifyToken =
+  let json = json.parseJson()
+  return SpotifyToken(
+    accessToken: json["access_token"].getStr,
+    refreshToken: json["refresh_token"].getStr,
+    expiresIn: json["expires_in"].getStr
+  )
+
+proc newSpotifyToken(json, refreshToken: string): SpotifyToken =
+  let json = json.parseJson()
+  return SpotifyToken(
+    accessToken: json["access_token"].getStr,
+    refreshToken: refreshToken,
+    expiresIn: json["expires_in"].getStr
+  )
+
 proc newSpotifyClient*(accessToken, refreshToken, expiresIn: string): SpotifyClient =
   let client = newHttpClient()
   return SpotifyClient(
@@ -66,11 +82,16 @@ proc authorizationCodeGrant*(client: HttpClient | AsyncHttpClient,
   let
     response = await client.authorizationCodeGrant(
       AuthorizeUrl, TokenUrl, clientId, clientSecret, scope = scope)
-    json = parseJson(await response.body)
-    accessToken = json["access_token"].getStr
-    expiresIn = json["expires_in"].getStr
-    refreshToken = json["refresh_token"].getStr
-  result = newSpotifyToken(accessToken, refreshToken, expiresIn)
+  result = newSpotifyToken(await response.body)
+
+proc refreshToken*(client: SpotifyClient | AsyncSpotifyClient,
+  clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.} =
+  let response = await client.client.refreshToken(
+    TokenUrl, clientId, clientSecret, client.refreshToken, scope)
+  result = newSpotifyToken(await response.body, client.refreshToken)
+  client.accessToken = result.accessToken
+  client.expiresIn = result.expiresIn
+  client.refreshToken = result.refreshToken
 
 proc request*(client: SpotifyClient | AsyncSpotifyClient, path: string,
   httpMethod = HttpGet, body = "",
