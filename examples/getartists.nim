@@ -16,8 +16,8 @@
 
 import ospaths
 import httpclient
-import .. / src / artists
-import .. / src / spotifyclient
+import .. / src / spotify / artists
+import .. / src / spotify / spotifyclient
 
 const target = "0OdUWJ0sBjDrqHygGUXeCF"
 

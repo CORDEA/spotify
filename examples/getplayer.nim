@@ -16,10 +16,10 @@
 
 import ospaths
 import httpclient
-import .. / src / scope
-import .. / src / player
-import .. / src / spotifyclient
-import .. / src / objects / currentlyplayingcontext
+import .. / src / spotify / scope
+import .. / src / spotify / player
+import .. / src / spotify / spotifyclient
+import .. / src / spotify / objects / currentlyplayingcontext
 
 let
   token = newHttpClient().authorizationCodeGrant(

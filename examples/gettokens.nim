@@ -16,7 +16,7 @@
 
 import ospaths
 import httpclient
-import .. / src / spotifyclient
+import .. / src / spotify / spotifyclient
 
 let
   token = newHttpClient().authorizationCodeGrant(

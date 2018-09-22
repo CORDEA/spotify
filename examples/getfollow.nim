@@ -16,9 +16,9 @@
 
 import ospaths
 import httpclient
-import .. / src / scope
-import .. / src / follow
-import .. / src / spotifyclient
+import .. / src / spotify / scope
+import .. / src / spotify / follow
+import .. / src / spotify / spotifyclient
 
 const
   artists = @["74ASZWbe4lXaubB36ztrGX", "08td7MxkoHQkXnWAYD8d6Q"]

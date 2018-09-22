@@ -16,9 +16,9 @@
 
 import ospaths
 import httpclient
-import .. / src / scope
-import .. / src / playlists
-import .. / src / spotifyclient
+import .. / src / spotify / scope
+import .. / src / spotify / playlists
+import .. / src / spotify / spotifyclient
 
 const
   testPlaylistId = "***"
