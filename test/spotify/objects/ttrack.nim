@@ -15,10 +15,10 @@
 # date  : 2018-09-05
 
 import unittest
-import .. / .. / src / objects / track
-import .. / .. / src / objects / externalid
-import .. / .. / src / objects / jsonunmarshaller
-import .. / .. / src / objects / internalunmarshallers
+import .. / .. / .. / src / spotify / objects / track
+import .. / .. / .. / src / spotify / objects / externalid
+import .. / .. / .. / src / spotify / objects / jsonunmarshaller
+import .. / .. / .. / src / spotify / objects / internalunmarshallers
 
 suite "Track test":
   setup:

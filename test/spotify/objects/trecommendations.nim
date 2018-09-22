@@ -15,10 +15,10 @@
 # date  : 2018-09-12
 
 import unittest
-import .. / .. / src / objects / recommendations
-import .. / .. / src / objects / recommendationseed
-import .. / .. / src / objects / jsonunmarshaller
-import .. / .. / src / objects / internalunmarshallers
+import .. / .. / .. / src / spotify / objects / recommendations
+import .. / .. / .. / src / spotify / objects / recommendationseed
+import .. / .. / .. / src / spotify / objects / jsonunmarshaller
+import .. / .. / .. / src / spotify / objects / internalunmarshallers
 
 suite "Recommendations test":
   setup:

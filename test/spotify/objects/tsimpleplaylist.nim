@@ -15,10 +15,10 @@
 # date  : 2018-09-12
 
 import unittest
-import .. / .. / src / objects / paging
-import .. / .. / src / objects / simpleplaylist
-import .. / .. / src / objects / jsonunmarshaller
-import .. / .. / src / objects / internalunmarshallers
+import .. / .. / .. / src / spotify / objects / paging
+import .. / .. / .. / src / spotify / objects / simpleplaylist
+import .. / .. / .. / src / spotify / objects / jsonunmarshaller
+import .. / .. / .. / src / spotify / objects / internalunmarshallers
 
 suite "SimplePlaylist test":
   setup:

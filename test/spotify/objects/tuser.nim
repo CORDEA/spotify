@@ -15,9 +15,9 @@
 # date  : 2018-09-02
 
 import unittest
-import .. / .. / src / objects / user
-import .. / .. / src / objects / jsonunmarshaller
-import .. / .. / src / objects / internalunmarshallers
+import .. / .. / .. / src / spotify / objects / user
+import .. / .. / .. / src / spotify / objects / jsonunmarshaller
+import .. / .. / .. / src / spotify / objects / internalunmarshallers
 
 suite "User test":
   setup:

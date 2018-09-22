@@ -15,7 +15,7 @@
 # date  : 2018-09-10
 
 import unittest
-import .. / src / spotifyuri
+import .. / .. / src / spotify / spotifyuri
 
 suite "Spotifyuri test":
   test "BuildPath":

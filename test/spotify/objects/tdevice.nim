@@ -15,9 +15,9 @@
 # date  : 2018-09-16
 
 import unittest
-import .. / .. / src / objects / device
-import .. / .. / src / objects / jsonunmarshaller
-import .. / .. / src / objects / internalunmarshallers
+import .. / .. / .. / src / spotify / objects / device
+import .. / .. / .. / src / spotify / objects / jsonunmarshaller
+import .. / .. / .. / src / spotify / objects / internalunmarshallers
 
 suite "Device test":
   setup:
