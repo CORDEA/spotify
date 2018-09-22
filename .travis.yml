@@ -1,0 +1,17 @@
+sudo: false
+language: c
+os:
+    - linux
+env:
+    - PATH=$PWD/Nim/bin:$PATH
+branches:
+    only:
+        - master
+install: .travis/install.sh
+before_script:
+    - set -e
+    - set -x
+script:
+    - cd test
+    - find . -name "*.nim" | xargs -I {} nim c -r {}
+    - cd ..
