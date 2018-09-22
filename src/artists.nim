@@ -53,15 +53,17 @@ proc getArtist*(client: SpotifyClient | AsyncSpotifyClient,
 proc getArtistAlbums*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, includeGroups: seq[IncludeGroupType] = @[],
   market = "", limit = 20, offset = 0): Future[SpotifyResponse[Paging[SimpleAlbum]]] {.multisync.} =
+  var queries = @[
+    newQuery("market", market),
+    newQuery("limit", $limit),
+    newQuery("offset", $offset)
+  ]
+  if includeGroups.len > 0:
+    queries.add(newQuery("include_groups", includeGroups
+      .map(proc (x: IncludeGroupType): string = $x)
+      .foldr(a & "," & b)))
   let
-    path = buildPath(subex(GetArtistAlbumsPath) % [id], @[
-      newQuery("include_groups", includeGroups
-        .map(proc (x: IncludeGroupType): string = $x)
-        .foldr(a & "," & b)),
-      newQuery("market", market),
-      newQuery("limit", $limit),
-      newQuery("offset", $offset)
-    ])
+    path = buildPath(subex(GetArtistAlbumsPath) % [id], queries)
     response = await client.request(path)
   result = await toResponse[Paging[SimpleAlbum]](response)
 
