@@ -62,7 +62,10 @@ proc toResponse*[T : ref object](unmarshaller: JsonUnmarshaller,
     body = await response.body
     code = response.code
   if code.is2xx:
-    result = success(code, to[T](unmarshaller, body))
+    if body == "":
+      result = success[T](code, nil)
+    else:
+      result = success(code, to[T](unmarshaller, body))
   else:
     result = failure[T](code, to[Error](unmarshaller, body, "error"))
 
