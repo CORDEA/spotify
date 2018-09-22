@@ -36,11 +36,13 @@ for device in devices:
   echo device.id
   echo device.name
 
-echo $context.repeatState
-echo context.isPlaying
+if context != nil:
+  echo $context.repeatState
+  echo context.isPlaying
 
-echo track.item.name
-echo track.progressMs
+if track != nil:
+  echo track.item.name
+  echo track.progressMs
 
 let
   pause = client.pause()
