@@ -30,5 +30,12 @@ let
     getEnv("SPOTIFY_SECRET"),
     @[]
   )
+  clientCredsToken = newHttpClient().clientCredsGrant(
+    getEnv("SPOTIFY_ID"),
+    getEnv("SPOTIFY_SECRET"),
+    @[]
+  )
 
 assert token.accessToken != newToken.accessToken
+assert clientCredsToken.accessToken != ""
+assert clientCredsToken.refreshToken == ""

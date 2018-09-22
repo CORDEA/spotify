@@ -36,6 +36,8 @@ type
   AsyncSpotifyClient* = ref object of BaseClient
     client: AsyncHttpClient
 
+  UnsupportedAuthorizationFlowError = object of Exception
+
 proc newSpotifyToken*(accessToken, refreshToken, expiresIn: string): SpotifyToken =
   return SpotifyToken(
     accessToken: accessToken,
@@ -45,9 +47,12 @@ proc newSpotifyToken*(accessToken, refreshToken, expiresIn: string): SpotifyToke
 
 proc newSpotifyToken(json: string): SpotifyToken =
   let json = json.parseJson()
+  var refreshToken = ""
+  if json.hasKey("refresh_token"):
+    refreshToken = json["refresh_token"].getStr
   return SpotifyToken(
     accessToken: json["access_token"].getStr,
-    refreshToken: json["refresh_token"].getStr,
+    refreshToken: refreshToken,
     expiresIn: json["expires_in"].getStr
   )
 
@@ -94,14 +99,21 @@ proc newAsyncSpotifyClient*(token: SpotifyToken): AsyncSpotifyClient =
   )
 
 proc authorizationCodeGrant*(client: HttpClient | AsyncHttpClient,
-  clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.}=
-  let
-    response = await client.authorizationCodeGrant(
-      AuthorizeUrl, TokenUrl, clientId, clientSecret, scope = scope)
+  clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.} =
+  let response = await client.authorizationCodeGrant(
+    AuthorizeUrl, TokenUrl, clientId, clientSecret, scope = scope)
+  result = newSpotifyToken(await response.body)
+
+proc clientCredsGrant*(client: HttpClient | AsyncHttpClient,
+  clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.} =
+  let response = await client.clientCredsGrant(
+    TokenUrl, clientId, clientSecret, scope = scope)
   result = newSpotifyToken(await response.body)
 
 proc refreshToken*(client: SpotifyClient | AsyncSpotifyClient,
   clientId, clientSecret: string, scope: seq[string]): Future[SpotifyToken] {.multisync.} =
+  if client.refreshToken == "":
+    raise newException(UnsupportedAuthorizationFlowError, "Refresh token is empty.")
   let response = await client.client.refreshToken(
     TokenUrl, clientId, clientSecret, client.refreshToken, scope)
   result = newSpotifyToken(await response.body, client.refreshToken)
