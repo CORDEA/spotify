@@ -53,6 +53,8 @@ proc unmarshalBasicTypes[K, V](unmarshaller: JsonUnmarshaller,
       v = ""
   elif v is int:
     v = node[k].getInt
+  elif v is float:
+    v = node[k].getFloat
   elif v is bool:
     if node.hasKey(k):
       v = node[k].getBool
