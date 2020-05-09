@@ -1,6 +1,6 @@
 # Package
 
-version     = "0.1"
+version     = "0.1.1"
 author      = "Yoshihiro Tanaka"
 description = "A Nim wrapper for the Spotify Web API"
 license     = "Apache License 2.0"
