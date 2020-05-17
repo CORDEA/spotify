@@ -14,6 +14,7 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-09
 
+import json
 import linkedtrack
 import externalurl
 import simpleartist
@@ -26,6 +27,12 @@ type
     explicit*, isPlayable*, isLocal*: bool
     artists*: seq[SimpleArtist]
     availableMarkets*: seq[string]
-    externalUrls*: seq[ExternalUrl]
+    externalUrls: seq[JsonNode]
     restrictions*: Restrictions
     linkedFrom*: LinkedTrack
+
+proc externalUrls*(track: SimpleTrack): seq[ExternalUrl] =
+  let nodes = track.externalUrls
+  result = @[]
+  for node in nodes:
+    result.add(node.parseExternalUrl())

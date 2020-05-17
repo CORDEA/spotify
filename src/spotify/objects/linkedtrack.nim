@@ -14,9 +14,16 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-05
 
+import json
 import externalurl
 
 type
   LinkedTrack* = ref object
     href*, id*, objectType*, uri*: string
-    externalUrls*: seq[ExternalUrl]
+    externalUrls: seq[JsonNode]
+
+proc externalUrls*(track: LinkedTrack): seq[ExternalUrl] =
+  let nodes = track.externalUrls
+  result = @[]
+  for node in nodes:
+    result.add(node.parseExternalUrl())

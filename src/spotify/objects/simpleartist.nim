@@ -14,9 +14,16 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
+import json
 import externalurl
 
 type
   SimpleArtist* = object
     href*, id*, name*, objectType*, uri*: string
-    externalUrls*: seq[ExternalUrl]
+    externalUrls: seq[JsonNode]
+
+proc externalUrls*(artist: SimpleArtist): seq[ExternalUrl] =
+  let nodes = artist.externalUrls
+  result = @[]
+  for node in nodes:
+    result.add(node.parseExternalUrl())
