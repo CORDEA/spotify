@@ -18,7 +18,7 @@ import json
 import jsonunmarshaller
 
 type
-  ExternalUrl* = ref object
+  ExternalUrl* = object
     urlType*, url*: string
 
 proc unmarshal*(unmarshaller: JsonUnmarshaller,

@@ -15,7 +15,7 @@
 # date  : 2018-09-04
 
 type
-  Paging*[T] = ref object
+  Paging*[T] = object
     href*, next*, previous*: string
     limit*, offset*, total*: int
     items*: seq[T]

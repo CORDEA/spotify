@@ -21,7 +21,7 @@ type
   CopyrightType* = enum
     TypeCopyright = "C",
     TypeSoundRecordingCopyright = "P"
-  Copyright* = ref object
+  Copyright* = object
     text*: string
     copyrightType*: CopyrightType
 

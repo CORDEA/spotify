@@ -15,6 +15,6 @@
 # date  : 2018-09-02
 
 type
-  Image* = ref object
+  Image* = object
     height*, width*: int
     url*: string

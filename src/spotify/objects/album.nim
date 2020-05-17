@@ -24,7 +24,7 @@ import restrictions
 import simpleartist
 
 type
-  Album* = ref object
+  Album* = object
     albumType*, href*, id*, label*, name*, objectType*, uri*: string
     releaseDate*, releaseDatePrecision*: string
     artists*: seq[SimpleArtist]

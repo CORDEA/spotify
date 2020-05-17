@@ -15,5 +15,5 @@
 # date  : 2018-09-05
 
 type
-  Restrictions* = ref object
+  Restrictions* = object
     reason*: string

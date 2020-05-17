@@ -17,6 +17,6 @@
 import externalurl
 
 type
-  SimpleArtist* = ref object
+  SimpleArtist* = object
     href*, id*, name*, objectType*, uri*: string
     externalUrls*: seq[ExternalUrl]

@@ -24,7 +24,7 @@ type
     TypeInternationalArticleNumber = "ean"
     TypeUniversalProductCode = "upc"
 
-  ExternalId* = ref object
+  ExternalId* = object
     idType*: ExternalIdType
     id*: string
 

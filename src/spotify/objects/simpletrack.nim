@@ -20,7 +20,7 @@ import simpleartist
 import restrictions
 
 type
-  SimpleTrack* = ref object
+  SimpleTrack* = object
     href*, id*, name*, previewUrl*, objectType*, uri*: string
     discNumber*, durationMs*, trackNumber*: int
     explicit*, isPlayable*, isLocal*: bool
