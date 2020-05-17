@@ -14,21 +14,17 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-10
 
+import json
 import subexes
 import sequtils
-import httpcore
 import spotifyuri
 import httpclient
 import spotifyclient
 import asyncdispatch
 import objects / album
-import objects / error
 import objects / paging
-import objects / copyright
 import objects / simpletrack
 import objects / spotifyresponse
-import objects / jsonunmarshaller
-import objects / internalunmarshallers
 
 const
   GetAlbumPath = "/albums/$#"
@@ -40,8 +36,12 @@ proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
   let
     path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
     response = await client.request(path)
-    unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
-  result = await toResponse[Album](unmarshaller, response)
+    code = response.code
+    body = parseJson(await response.body)
+  if code.is2xx:
+    result = success(code, to(body, Album))
+  else:
+    result = failure[Album](code, body)
 
 proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, limit = 20, offset = 0,
@@ -53,7 +53,12 @@ proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("offset", $offset)
     ])
     response = await client.request(path)
-  result = await toResponse[Paging[SimpleTrack]](response)
+    code = response.code
+    body = parseJson(await response.body)
+  if code.is2xx:
+    result = success(code, to(body, Paging[SimpleTrack]))
+  else:
+    result = failure[Paging[SimpleTrack]](code, body)
 
 proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
   ids: seq[string] = @[], market = ""): Future[SpotifyResponse[seq[Album]]] {.multisync.} =
@@ -63,10 +68,9 @@ proc getAlbums*(client: SpotifyClient | AsyncSpotifyClient,
       newQuery("market", market)
     ])
     response = await client.request(path)
-    body = await response.body
-    unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
     code = response.code
+    body = parseJson(await response.body)
   if code.is2xx:
-    result = success(code, toSeq[Album](unmarshaller, body, "albums"))
+    result = success(code, to(body["albums"], seq[Album]))
   else:
     result = failure[seq[Album]](code, body)
