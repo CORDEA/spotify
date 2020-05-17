@@ -14,9 +14,6 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
-import json
-import jsonunmarshaller
-
 type
   CopyrightType* = enum
     TypeCopyright = "C",
@@ -25,4 +22,4 @@ type
     text*: string
     copyrightType*: CopyrightType
 
-let copyrightReplaceTargets* = @[newReplaceTarget("copyrightType", "type")]
+# let copyrightReplaceTargets* = @[newReplaceTarget("copyrightType", "type")]
