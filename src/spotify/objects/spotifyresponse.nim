@@ -19,8 +19,6 @@ import error
 import httpcore
 import httpclient
 import asyncdispatch
-import jsonunmarshaller
-import internalunmarshallers
 
 type
   SpotifyResponse*[T] = ref object
@@ -49,14 +47,14 @@ proc failure[T](code: HttpCode, error: Error): SpotifyResponse[T] =
     error: error
   )
 
-proc failure*[T](code: HttpCode, body: string): SpotifyResponse[T] =
+proc failure*[T](code: HttpCode, body: JsonNode): SpotifyResponse[T] =
   result = SpotifyResponse[T](
     isSuccess: false,
     code: code,
-    error: to[Error](emptyJsonUnmarshaller, body, "error")
+    error: to(body["error"], Error)
   )
 
-proc toResponse*[T : ref object](unmarshaller: JsonUnmarshaller,
+proc toResponse*[T : ref object](
   response: Response | AsyncResponse): Future[SpotifyResponse[T]] {.multisync.} =
   let
     body = await response.body
@@ -65,18 +63,14 @@ proc toResponse*[T : ref object](unmarshaller: JsonUnmarshaller,
     if body == "":
       result = success[T](code, nil)
     else:
-      result = success(code, to[T](unmarshaller, body))
+      result = success(code, to(parseJson(body), T))
   else:
-    result = failure[T](code, to[Error](unmarshaller, body, "error"))
-
-proc toResponse*[T : ref object](response: Response | AsyncResponse
-  ): Future[SpotifyResponse[T]] {.multisync.} =
-  result = await toResponse[T](emptyJsonUnmarshaller, response)
+    result = failure[T](code, to(parseJson(body)["error"], Error))
 
 proc toEmptyResponse*(response: Response | AsyncResponse
   ): Future[SpotifyResponse[void]] {.multisync.} =
   let
-    body = await response.body
+    body = parseJson(await response.body)
     code = response.code
   if code.is2xx:
     result = success(code)
