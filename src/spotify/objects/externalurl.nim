@@ -14,17 +14,19 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-02
 
+import json
+
 type
   ExternalUrl* = object
     urlType*, url*: string
 
-# proc unmarshal*(unmarshaller: JsonUnmarshaller,
-  # t: ExternalUrl, node: JsonNode) =
-  # for k, v in node:
-    # for key, value in t[].fieldPairs:
-      # when value is string:
-        # case key
-        # of "urlType":
-          # value = k
-        # of "url":
-          # value = v.getStr
+proc parseExternalUrl*(node: JsonNode): ExternalUrl =
+  result = ExternalUrl()
+  for k, v in node:
+    for key, value in result.fieldPairs:
+      when value is string:
+        case key
+        of "urlType":
+          value = k
+        of "url":
+          value = v.getStr

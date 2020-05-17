@@ -14,6 +14,7 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
+import json
 import image
 import paging
 import copyright
@@ -30,10 +31,22 @@ type
     artists*: seq[SimpleArtist]
     availableMarkets*: seq[string]
     copyrights*: seq[Copyright]
-    externalIds*: seq[ExternalId]
-    externalUrls*: seq[ExternalUrl]
+    externalIds: seq[JsonNode]
+    externalUrls: seq[JsonNode]
     genres*: seq[string]
     images*: seq[Image]
     popularity*: int
     restrictions*: Restrictions
     tracks*: Paging[SimpleTrack]
+
+proc externalIds*(album: Album): seq[ExternalId] =
+  let nodes = album.externalIds
+  result = @[]
+  for node in nodes:
+    result.add(node.parseExternalId())
+
+proc externalUrls*(album: Album): seq[ExternalUrl] =
+  let nodes = album.externalUrls
+  result = @[]
+  for node in nodes:
+    result.add(node.parseExternalUrl())

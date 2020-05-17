@@ -14,6 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-04
 
+import json
+import strutils
+
 type
   ExternalIdType* = enum
     TypeInternationalStandardRecordingCode = "isrc"
@@ -24,11 +27,11 @@ type
     idType*: ExternalIdType
     id*: string
 
-# proc unmarshal*(unmarshaller: JsonUnmarshaller,
-  # t: ExternalId, node: JsonNode) =
-  # for k, v in node:
-    # for key, value in t[].fieldPairs:
-      # when value is ExternalIdType:
-        # value = parseEnum[ExternalIdType](k)
-      # elif value is string:
-        # value = v.getStr
+proc parseExternalId*(node: JsonNode): ExternalId =
+  result = ExternalId()
+  for k, v in node:
+    for key, value in result.fieldPairs:
+      when value is ExternalIdType:
+        value = parseEnum[ExternalIdType](k)
+      elif value is string:
+        value = v.getStr
