@@ -15,7 +15,6 @@
 # date  : 2018-09-10
 
 import json
-import subexes
 import sequtils
 import spotifyuri
 import httpclient
@@ -27,14 +26,14 @@ import objects / simpletrack
 import objects / spotifyresponse
 
 const
-  GetAlbumPath = "/albums/$#"
-  GetTracksPath = "/albums/$#/tracks"
+  GetAlbumPath = "/albums/"
+  GetTracksPath = "/tracks"
   GetAlbumsPath = "/albums"
 
 proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, market = ""): Future[SpotifyResponse[Album]] {.multisync.} =
   let
-    path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
+    path = buildPath(GetAlbumPath & id, @[newQuery("market", market)])
     response = await client.request(path)
     code = response.code
     body = parseJson(await response.body)
@@ -47,7 +46,7 @@ proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, limit = 20, offset = 0,
   market = ""): Future[SpotifyResponse[Paging[SimpleTrack]]] {.multisync.} =
   let
-    path = buildPath(subex(GetTracksPath) % [id], @[
+    path = buildPath(GetAlbumPath & id & GetTracksPath, @[
       newQuery("market", market),
       newQuery("limit", $limit),
       newQuery("offset", $offset)
