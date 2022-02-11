@@ -10,3 +10,4 @@ srcDir      = "src"
 
 requires "nim >= 0.18.0"
 requires "oauth"
+requires "subexes"
