@@ -216,4 +216,4 @@ proc uploadCustomPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
 proc uploadCustomPlaylistCoverImageWithPath*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId, jpegPath: string): Future[SpotifyResponse[void]] {.multisync} =
   result = await client.uploadCustomPlaylistCoverImage(playlistId,
-    encode(readFile(jpegPath), newLine = ""))
+    encode(readFile(jpegPath)))
