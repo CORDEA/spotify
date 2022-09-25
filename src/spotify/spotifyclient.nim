@@ -36,7 +36,7 @@ type
   AsyncSpotifyClient* = ref object of BaseClient
     client: AsyncHttpClient
 
-  UnsupportedAuthorizationFlowError = object of Exception
+  UnsupportedAuthorizationFlowError = object of CatchableError
 
 proc newSpotifyToken*(accessToken, refreshToken, expiresIn: string): SpotifyToken =
   return SpotifyToken(
