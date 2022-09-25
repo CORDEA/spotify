@@ -15,8 +15,8 @@
 # date  : 2018-09-13
 
 import json
-import subexes
 import sequtils
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -29,12 +29,12 @@ import objects / internalunmarshallers
 
 const
   IsFollowingPath = "/me/following/contains"
-  IsFollowingPlaylistPath = "/users/$#/playlists/$#/followers/contains"
+  IsFollowingPlaylistPath = "/users/{ownerId}/playlists/{playlistId}/followers/contains"
   FollowPath = "/me/following"
-  FollowPlaylistPath = "/playlists/$#/followers"
+  FollowPlaylistPath = "/playlists/{playlistId}/followers"
   GetFollowedPath = "/me/following"
   UnfollowPath = "/me/following"
-  UnfollowPlaylistPath = "/playlists/$#/followers"
+  UnfollowPlaylistPath = "/playlists/{playlistId}/followers"
 
 proc internalIsFollow(client: SpotifyClient | AsyncSpotifyClient,
   followType: string, ids: seq[string]): Future[SpotifyResponse[seq[bool]]] {.multisync.} =
@@ -67,7 +67,7 @@ proc isFollowPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   ownerId, playlistId: string,
   ids: seq[string]): Future[SpotifyResponse[seq[bool]]] {.multisync.} =
   let
-    path = buildPath(subex(IsFollowingPlaylistPath) % [ownerId, playlistId], @[
+    path = buildPath(IsFollowingPlaylistPath.fmt, @[
       newQuery("ids", ids.foldr(a & "," & b))
     ])
     response = await client.request(path)
@@ -103,7 +103,7 @@ proc followUser*(client: SpotifyClient | AsyncSpotifyClient,
 proc followPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, public = true): Future[SpotifyResponse[void]] {.multisync.} =
   let
-    path = buildPath(subex(FollowPlaylistPath) % [playlistId], @[])
+    path = buildPath(FollowPlaylistPath.fmt, @[])
     body = %* {"public": public}
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
@@ -145,6 +145,6 @@ proc unfollowUser*(client: SpotifyClient | AsyncSpotifyClient,
 proc unfollowPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string): Future[SpotifyResponse[void]] {.multisync.} =
   let
-    path = buildPath(subex(UnfollowPlaylistPath) % [playlistId], @[])
+    path = buildPath(UnfollowPlaylistPath.fmt, @[])
     response = await client.request(path, httpMethod = HttpDelete)
   result = await toEmptyResponse(response)

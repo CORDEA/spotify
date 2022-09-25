@@ -14,8 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-10
 
-import subexes
 import sequtils
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -30,10 +30,10 @@ import objects / jsonunmarshaller
 import objects / internalunmarshallers
 
 const
-  GetAristPath = "/artists/$#"
-  GetArtistAlbumsPath = "/artists/$#/albums"
-  GetArtistTopTracksPath = "/artists/$#/top-tracks"
-  GetArtistRelatedArtistsPath = "/artists/$#/related-artists"
+  GetAristPath = "/artists/{id}"
+  GetArtistAlbumsPath = "/artists/{id}/albums"
+  GetArtistTopTracksPath = "/artists/{id}/top-tracks"
+  GetArtistRelatedArtistsPath = "/artists/{id}/related-artists"
   GetArtistsPath = "/artists"
 
 type
@@ -46,7 +46,7 @@ type
 proc getArtist*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[SpotifyResponse[Artist]] {.multisync.} =
   let
-    path = buildPath(subex(GetAristPath) % [id], @[])
+    path = buildPath(GetAristPath.fmt, @[])
     response = await client.request(path)
   result = await toResponse[Artist](response)
 
@@ -63,14 +63,14 @@ proc getArtistAlbums*(client: SpotifyClient | AsyncSpotifyClient,
       .map(proc (x: IncludeGroupType): string = $x)
       .foldr(a & "," & b)))
   let
-    path = buildPath(subex(GetArtistAlbumsPath) % [id], queries)
+    path = buildPath(GetArtistAlbumsPath.fmt, queries)
     response = await client.request(path)
   result = await toResponse[Paging[SimpleAlbum]](response)
 
 proc getArtistTopTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id, market: string): Future[SpotifyResponse[seq[Track]]] {.multisync.} =
   let
-    path = buildPath(subex(GetArtistTopTracksPath) % [id], @[newQuery("market", market)])
+    path = buildPath(GetArtistTopTracksPath.fmt, @[newQuery("market", market)])
     response = await client.request(path)
     body = await response.body
     code = response.code
@@ -82,7 +82,7 @@ proc getArtistTopTracks*(client: SpotifyClient | AsyncSpotifyClient,
 proc getArtistRelatedArtists*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[SpotifyResponse[seq[Artist]]] {.multisync.} =
   let
-    path = buildPath(subex(GetArtistRelatedArtistsPath) % [id], @[])
+    path = buildPath(GetArtistRelatedArtistsPath.fmt, @[])
     response = await client.request(path)
     body = await response.body
     code = response.code

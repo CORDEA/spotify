@@ -14,8 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-16
 
-import subexes
 import sequtils
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -28,16 +28,16 @@ import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
-  GetAudioAnalysisPath = "/audio-analysis/$#"
-  GetAudioFeaturePath = "/audio-features/$#"
+  GetAudioAnalysisPath = "/audio-analysis/{id}"
+  GetAudioFeaturePath = "/audio-features/{id}"
   GetAudioFeaturesPath = "/audio-features"
-  GetTrackPath = "/tracks/$#"
+  GetTrackPath = "/tracks/{id}"
   GetTracksPath = "/tracks"
 
 proc getAudioAnalysis*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[SpotifyResponse[AudioAnalysis]] {.multisync.} =
   let
-    path = buildPath(subex(GetAudioAnalysisPath) % [id], @[])
+    path = buildPath(GetAudioAnalysisPath.fmt, @[])
     response = await client.request(path)
     body = await response.body
   result = await toResponse[AudioAnalysis](response)
@@ -45,7 +45,7 @@ proc getAudioAnalysis*(client: SpotifyClient | AsyncSpotifyClient,
 proc getAudioFeature*(client: SpotifyClient | AsyncSpotifyClient,
   id: string): Future[SpotifyResponse[AudioFeature]] {.multisync.} =
   let
-    path = buildPath(subex(GetAudioFeaturePath) % [id], @[])
+    path = buildPath(GetAudioFeaturePath.fmt, @[])
     response = await client.request(path)
   result = await toResponse[AudioFeature](response)
 
@@ -66,7 +66,7 @@ proc getAudioFeatures*(client: SpotifyClient | AsyncSpotifyClient,
 proc getTrack*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, market = ""): Future[SpotifyResponse[Track]] {.multisync.} =
   let
-    path = buildPath(subex(GetTrackPath) % [id], @[])
+    path = buildPath(GetTrackPath.fmt, @[])
     response = await client.request(path)
   result = await toResponse[Track](response)
 

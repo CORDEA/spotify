@@ -14,9 +14,9 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-10
 
-import subexes
 import sequtils
 import httpcore
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -31,14 +31,14 @@ import objects / jsonunmarshaller
 import objects / internalunmarshallers
 
 const
-  GetAlbumPath = "/albums/$#"
-  GetTracksPath = "/albums/$#/tracks"
+  GetAlbumPath = "/albums/{id}"
+  GetTracksPath = "/albums/{id}/tracks"
   GetAlbumsPath = "/albums"
 
 proc getAlbum*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, market = ""): Future[SpotifyResponse[Album]] {.multisync.} =
   let
-    path = buildPath(subex(GetAlbumPath) % [id], @[newQuery("market", market)])
+    path = buildPath(GetAlbumPath.fmt, @[newQuery("market", market)])
     response = await client.request(path)
     unmarshaller = newJsonUnmarshaller(copyrightReplaceTargets)
   result = await toResponse[Album](unmarshaller, response)
@@ -47,7 +47,7 @@ proc getAlbumTracks*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, limit = 20, offset = 0,
   market = ""): Future[SpotifyResponse[Paging[SimpleTrack]]] {.multisync.} =
   let
-    path = buildPath(subex(GetTracksPath) % [id], @[
+    path = buildPath(GetTracksPath.fmt, @[
       newQuery("market", market),
       newQuery("limit", $limit),
       newQuery("offset", $offset)

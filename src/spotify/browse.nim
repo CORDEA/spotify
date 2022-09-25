@@ -14,8 +14,8 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-12
 
-import subexes
 import sequtils
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -33,8 +33,8 @@ import objects / recommendationseed
 import objects / internalunmarshallers
 
 const
-  GetCategoryPath = "/browse/categories/$#"
-  GetCategoryPlaylistsPath = "/browse/categories/$#/playlists"
+  GetCategoryPath = "/browse/categories/{id}"
+  GetCategoryPlaylistsPath = "/browse/categories/{id}/playlists"
   GetCategoriesPath = "/browse/categories"
   GetFeaturedPlaylistsPath = "/browse/featured-playlists"
   GetNewReleasesPath = "/browse/new-releases"
@@ -43,7 +43,7 @@ const
 proc getCategory*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, country, locale = ""): Future[SpotifyResponse[Category]] {.multisync.} =
   let
-    path = buildPath(subex(GetCategoryPath) % [id], @[
+    path = buildPath(GetCategoryPath.fmt, @[
       newQuery("country", country),
       newQuery("locale", locale),
     ])
@@ -54,7 +54,7 @@ proc getCategoryPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   id: string, country = "",
   limit = 20, offset = 0): Future[SpotifyResponse[Paging[SimplePlaylist]]] {.multisync.} =
   let
-    path = buildPath(subex(GetCategoryPlaylistsPath) % [id], @[
+    path = buildPath(GetCategoryPlaylistsPath.fmt, @[
       newQuery("country", country),
       newQuery("limit", $limit),
       newQuery("offset", $offset)

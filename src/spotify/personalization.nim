@@ -14,7 +14,7 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-14
 
-import subexes
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -27,7 +27,7 @@ import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
-  GetUserTopDataPath = "/me/top/$#"
+  GetUserTopDataPath = "/me/top/{getType}"
 
 type
   TimeRange* = enum
@@ -39,7 +39,7 @@ proc internalGet(client: SpotifyClient | AsyncSpotifyClient,
   getType: string, limit = 20, offset = 0,
   timeRange = TypeMediumTerm): Future[Response | AsyncResponse] {.multisync.} =
   let
-    path = buildPath(subex(GetUserTopDataPath) % [getType], @[
+    path = buildPath(GetUserTopDataPath.fmt, @[
       newQuery("limit", $limit),
       newQuery("offset", $offset),
       newQuery("time_range", $timeRange)

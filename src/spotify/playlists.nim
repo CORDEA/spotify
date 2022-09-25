@@ -16,8 +16,8 @@
 
 import json
 import base64
-import subexes
 import sequtils
+import strformat
 import spotifyuri
 import httpclient
 import spotifyclient
@@ -33,18 +33,18 @@ import objects / spotifyresponse
 import objects / internalunmarshallers
 
 const
-  PostTracksToPlaylistPath = "/playlists/$#/tracks"
-  ChangePlaylistDetailsPath = "/playlists/$#"
-  PostPlaylistPath = "/users/$#/playlists"
+  PostTracksToPlaylistPath = "/playlists/{playlistId}/tracks"
+  ChangePlaylistDetailsPath = "/playlists/{playlistId}"
+  PostPlaylistPath = "/users/{userId}/playlists"
   GetUserPlaylistsPath = "/me/playlists"
-  GetPlaylistsPath = "/users/$#/playlists"
-  GetPlaylistCoverImagePath = "/playlists/$#/images"
-  GetPlaylistPath = "/playlists/$#"
-  GetPlaylistTracksPath = "/playlists/$#/tracks"
-  DeleteTracksFromPlaylistPath = "/playlists/$#/tracks"
-  ReorderPlaylistTracksPath = "/playlists/$#/tracks"
-  ReplacePlaylistTracksPath = "/playlists/$#/tracks"
-  UploadCustomPlaylistCoverImagePath = "/playlists/$#/images"
+  GetPlaylistsPath = "/users/{userId}/playlists"
+  GetPlaylistCoverImagePath = "/playlists/{playlistId}/images"
+  GetPlaylistPath = "/playlists/{playlistId}"
+  GetPlaylistTracksPath = "/playlists/{playlistId}/tracks"
+  DeleteTracksFromPlaylistPath = "/playlists/{playlistId}/tracks"
+  ReorderPlaylistTracksPath = "/playlists/{playlistId}/tracks"
+  ReplacePlaylistTracksPath = "/playlists/{playlistId}/tracks"
+  UploadCustomPlaylistCoverImagePath = "/playlists/{playlistId}/images"
 
 proc postTracksToPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, uris: seq[string],
@@ -53,7 +53,7 @@ proc postTracksToPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   if position != -1:
     body["position"] = %* position
   let
-    path = buildPath(subex(PostTracksToPlaylistPath) % [playlistId], @[])
+    path = buildPath(PostTracksToPlaylistPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPost)
   result = await toResponse[Snapshot](response)
 
@@ -68,7 +68,7 @@ proc changePlaylistDetails*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, name, description = ""): Future[SpotifyResponse[void]] {.multisync.} =
   let
     body = buildBody(name, description)
-    path = buildPath(subex(ChangePlaylistDetailsPath) % [playlistId], @[])
+    path = buildPath(ChangePlaylistDetailsPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
@@ -78,7 +78,7 @@ proc changePlaylistDetails*(client: SpotifyClient | AsyncSpotifyClient,
   var body = buildBody(name, description)
   body["public"] = %* public
   let
-    path = buildPath(subex(ChangePlaylistDetailsPath) % [playlistId], @[])
+    path = buildPath(ChangePlaylistDetailsPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
@@ -88,7 +88,7 @@ proc changePlaylistDetails*(client: SpotifyClient | AsyncSpotifyClient,
   var body = buildBody(name, description)
   body["collaborative"] = %* collaborative
   let
-    path = buildPath(subex(ChangePlaylistDetailsPath) % [playlistId], @[])
+    path = buildPath(ChangePlaylistDetailsPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
@@ -99,7 +99,7 @@ proc changePlaylistDetails*(client: SpotifyClient | AsyncSpotifyClient,
   body["public"] = %* public
   body["collaborative"] = %* collaborative
   let
-    path = buildPath(subex(ChangePlaylistDetailsPath) % [playlistId], @[])
+    path = buildPath(ChangePlaylistDetailsPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
@@ -110,7 +110,7 @@ proc postPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   if description != "":
     body["description"] = %* description
   let
-    path = buildPath(subex(PostPlaylistPath) % [userId], @[])
+    path = buildPath(PostPlaylistPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPost)
   result = await toResponse[Playlist](response)
 
@@ -128,7 +128,7 @@ proc getPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
   userId: string, limit = 20,
   offset = 0): Future[SpotifyResponse[Paging[SimplePlaylist]]] {.multisync.} =
   let
-    path = buildPath(subex(GetPlaylistsPath) % [userId], @[
+    path = buildPath(GetPlaylistsPath.fmt, @[
       newQuery("limit", $limit),
       newQuery("offset", $offset)
     ])
@@ -138,7 +138,7 @@ proc getPlaylists*(client: SpotifyClient | AsyncSpotifyClient,
 proc getPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string): Future[SpotifyResponse[seq[Image]]] {.multisync.} =
   let
-    path = buildPath(subex(GetPlaylistCoverImagePath) % [playlistId], @[])
+    path = buildPath(GetPlaylistCoverImagePath.fmt, @[])
     response = await client.request(path)
     body = await response.body
     code = response.code
@@ -150,7 +150,7 @@ proc getPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
 proc getPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, fields, market = ""): Future[SpotifyResponse[Playlist]] {.multisync.} =
   let
-    path = buildPath(subex(GetPlaylistPath) % [playlistId], @[
+    path = buildPath(GetPlaylistPath.fmt, @[
       newQuery("fields", fields),
       newQuery("market", market)
     ])
@@ -161,7 +161,7 @@ proc getPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, fields = "", limit = 100,
   offset = 0, market = ""): Future[SpotifyResponse[Paging[PlaylistTrack]]] {.multisync.} =
   let
-    path = buildPath(subex(GetPlaylistTracksPath) % [playlistId], @[
+    path = buildPath(GetPlaylistTracksPath.fmt, @[
       newQuery("fields", fields),
       newQuery("limit", $limit),
       newQuery("offset", $offset),
@@ -178,7 +178,7 @@ proc deleteTracksFromPlaylist*(client: SpotifyClient | AsyncSpotifyClient,
     arr.add(%* {"uri": track})
   body["tracks"] = arr
   let
-    path = buildPath(subex(DeleteTracksFromPlaylistPath) % [playlistId], @[])
+    path = buildPath(DeleteTracksFromPlaylistPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpDelete)
   result = await toResponse[Snapshot](response)
 
@@ -193,7 +193,7 @@ proc reorderPlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   if snapshotId != "":
     body["snapshot_id"] = %* snapshotId
   let
-    path = buildPath(subex(ReorderPlaylistTracksPath) % [playlistId], @[])
+    path = buildPath(ReorderPlaylistTracksPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toResponse[Snapshot](response)
 
@@ -201,14 +201,14 @@ proc replacePlaylistTracks*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId: string, uris: seq[string]): Future[SpotifyResponse[void]] {.multisync} =
   let
     body = %* {"uris": uris}
-    path = buildPath(subex(ReplacePlaylistTracksPath) % [playlistId], @[])
+    path = buildPath(ReplacePlaylistTracksPath.fmt, @[])
     response = await client.request(path, body = $body, httpMethod = HttpPut)
   result = await toEmptyResponse(response)
 
 proc uploadCustomPlaylistCoverImage*(client: SpotifyClient | AsyncSpotifyClient,
   playlistId, encodedData: string): Future[SpotifyResponse[void]] {.multisync} =
   let
-    path = buildPath(subex(UploadCustomPlaylistCoverImagePath) % [playlistId], @[])
+    path = buildPath(UploadCustomPlaylistCoverImagePath.fmt, @[])
     response = await client.request(path, body = encodedData, httpMethod = HttpPut,
       extraHeaders = newHttpHeaders({"Content-Type": "image/jpeg"}))
   result = await toEmptyResponse(response)

@@ -10,7 +10,6 @@ srcDir      = "src"
 
 requires "nim >= 0.18.0"
 requires "oauth"
-requires "subexes"
 
 task test, "Test spotify":
   exec "find src/ -name \"*.nim\" | xargs -I {} nim c -r -d:testing -d:ssl -o:test {}"
