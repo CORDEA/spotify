@@ -14,7 +14,7 @@
 # Author: Yoshihiro Tanaka <contact@cordea.jp>
 # date  : 2018-09-13
 
-import ospaths
+import os
 import httpclient
 import .. / src / spotify / browse
 import .. / src / spotify / spotifyclient
